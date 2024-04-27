@@ -20,6 +20,7 @@ from inference.post_process import post_process_output
 from utils.data import get_dataset
 from utils.dataset_processing import evaluation
 from utils.visualisation.gridshow import gridshow
+from utils import count_parameters
 
 from models.lgrasp import make_model
 
@@ -316,28 +317,15 @@ def run():
     else:
         raise NotImplementedError('Optimizer {} is not implemented'.format(args.optim))
 
-    # Print model params
-    from prettytable import PrettyTable
-    def count_parameters(model):
-        table = PrettyTable(["Modules", "Parameters"])
-        total_params = 0
-        for name, parameter in model.named_parameters():
-            if not parameter.requires_grad:
-                continue
-            params = parameter.numel()
-            table.add_row([name, params])
-            total_params += params
-        print(table)
-        print(f"Total Trainable Params: {total_params}")
-        return total_params
-    
+    # Print model params    
     logging.info('Model Parameters:')
-    count_parameters(net)
     f = open(os.path.join(save_folder, 'arch.txt'), 'w')
     sys.stdout = f
-    count_parameters(net)
+    trainable_params_count = count_parameters(net)
     sys.stdout = sys.__stdout__
     f.close()
+
+    logging.info('Trainable Parameters: {}'.format(trainable_params_count))
 
     # # Print model architecture.
     # input_channels = 1 * args.use_depth + 3 * args.use_rgb
