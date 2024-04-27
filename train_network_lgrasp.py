@@ -47,11 +47,11 @@ def parse_args():
     # LGraspNet
     parser.add_argument('--backbone', type=str, default="clip_vitl16_384",
                         help="backbone network")
-    parser.add_argument('--num_features', type=int, default=256,
+    parser.add_argument('--num-features', type=int, default=256,
                         help="number of features that go from encoder to decoder")
-    parser.add_argument('--arch_option', type=int, default=0,
+    parser.add_argument('--arch-option', type=int, default=0,
                         help="which kind of architecture to be used")
-    parser.add_argument('--block_depth', type=int, default=0,
+    parser.add_argument('--block-depth', type=int, default=0,
                         help="how many blocks should be used")
     parser.add_argument("--activation", choices=['lrelu', 'tanh'], default="lrelu",
                         help="use which activation to activate the block")

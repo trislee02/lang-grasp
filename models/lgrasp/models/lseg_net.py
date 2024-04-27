@@ -148,10 +148,16 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
 
         self.arch_option = kwargs["arch_option"]
         if self.arch_option == 1:
-            self.scratch.head_block = bottleneck_block(activation=kwargs["activation"])
+            self.scratch.head_block_pos = bottleneck_block(activation=kwargs["activation"])
+            self.scratch.head_block_cos = bottleneck_block(activation=kwargs["activation"])
+            self.scratch.head_block_sin = bottleneck_block(activation=kwargs["activation"])
+            self.scratch.head_block_width = bottleneck_block(activation=kwargs["activation"])
             self.block_depth = kwargs['block_depth']
         elif self.arch_option == 2:
-            self.scratch.head_block = depthwise_block(activation=kwargs["activation"])
+            self.scratch.head_block_pos = depthwise_block(activation=kwargs["activation"])
+            self.scratch.head_block_cos = depthwise_block(activation=kwargs["activation"])
+            self.scratch.head_block_sin = depthwise_block(activation=kwargs["activation"])
+            self.scratch.head_block_width = depthwise_block(activation=kwargs["activation"])
             self.block_depth = kwargs['block_depth']
 
         self.scratch.output_conv_pos = nn.Sequential(
@@ -166,8 +172,6 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         self.scratch.output_conv_width = nn.Sequential(
             Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
         )
-
-        self.aTest = nn.Conv2d(features, self.out_c, kernel_size=1)
 
         self.text = clip.tokenize(self.labels)    
         
@@ -231,15 +235,23 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
 
         if self.arch_option in [1, 2]:
             for _ in range(self.block_depth - 1):
-                out = self.scratch.head_block(out)
-            out = self.scratch.head_block(out, False)
+                out_pos = self.scratch.head_block_pos(out)
+                out_cos = self.scratch.head_block_cos(out)
+                out_sin = self.scratch.head_block_sin(out)
+                out_width = self.scratch.head_block_width(out)
+
+            out_pos = self.scratch.head_block(out_pos, False)
+            out_cos = self.scratch.head_block(out_cos, False)
+            out_sin = self.scratch.head_block(out_sin, False)
+            out_width = self.scratch.head_block(out_width, False)
+
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        pos_output = self.scratch.output_conv_pos(out) # [batch_size, 1, H, W]
-        cos_output = self.scratch.output_conv_cos(out) # [batch_size, 1, H, W]
-        sin_output = self.scratch.output_conv_sin(out) # [batch_size, 1, H, W]
-        width_output = self.scratch.output_conv_width(out) # [batch_size, 1, H, W]
+        pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
+        cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
+        sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
+        width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
 
         # pos_output.requires_grad_(True)
         # cos_output.requires_grad_(True)
