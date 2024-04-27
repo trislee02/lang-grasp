@@ -187,7 +187,8 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             lossd = net.compute_loss(xc, yc)
             loss = lossd['loss']
 
-            if batch_idx % 100 == 0:
+            batch_n = 1
+            if batch_idx % batch_n == 0:
                 logging.info('Epoch: {}, Batch: {}, Loss: {:0.4f}'.format(epoch, batch_idx, loss.item()))
 
             results['loss'] += loss.item()
