@@ -182,7 +182,7 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             if batch_idx >= batches_per_epoch:
                 break
 
-            xc = x.to(device)
+            xc = (x[0].to(device), x[1])
             yc = [yy.to(device) for yy in y]
             lossd = net.compute_loss(xc, yc)
             loss = lossd['loss']
