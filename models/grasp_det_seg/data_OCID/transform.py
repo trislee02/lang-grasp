@@ -77,7 +77,7 @@ class OCIDTransform:
         width = np.sqrt(np.sum((A[:, :, 0] - A[:, :, 1]) ** 2, axis=1))
         height = np.sqrt(np.sum((A[:, :, 1] - A[:, :, 2]) ** 2, axis=1))
 
-        theta = np.zeros((A.shape[0]), dtype=np.int)
+        theta = np.zeros((A.shape[0]), dtype=int)
 
         theta = np.arctan((A[:, 1, 1] - A[:, 1, 0]) / (A[:, 0, 0] - A[:, 0, 1]))
         b = np.arctan((A[:, 1, 0] - A[:, 1, 1]) / (A[:, 0, 1] - A[:, 0, 0]))

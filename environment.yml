@@ -20,5 +20,4 @@ dependencies:
         - tensorboardX
         - pyrealsense2
         - Pillow
-        - numpy==1.19.5
     

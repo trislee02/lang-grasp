@@ -24,7 +24,7 @@ def prepare_frcnn_format(boxes,im_size):
     width = np.sqrt(np.sum((boxes_ary[:, :, 0] - boxes_ary[:, :, 1]) ** 2, axis=1))
     height = np.sqrt(np.sum((boxes_ary[:, :, 1] - boxes_ary[:, :, 2]) ** 2, axis=1))
 
-    theta = np.zeros((boxes_ary.shape[0]), dtype=np.int)
+    theta = np.zeros((boxes_ary.shape[0]), dtype=int)
     theta = np.arctan((boxes_ary[:, 1, 1] - boxes_ary[:, 1, 0]) / (boxes_ary[:, 0, 0] - boxes_ary[:, 0, 1]))
     b = np.arctan((boxes_ary[:, 1, 0] - boxes_ary[:, 1, 1]) / (boxes_ary[:, 0, 1] - boxes_ary[:, 0, 0]))
     theta[np.where(boxes_ary[:, 0, 0] <= boxes_ary[:, 0, 1])] = b[np.where(boxes_ary[:, 0, 0] <= boxes_ary[:, 0, 1])]
