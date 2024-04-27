@@ -239,12 +239,16 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
                 out_cos = self.scratch.head_block_cos(out)
                 out_sin = self.scratch.head_block_sin(out)
                 out_width = self.scratch.head_block_width(out)
-
-            out_pos = self.scratch.head_block_pos(out_pos, False)
-            out_cos = self.scratch.head_block_cos(out_cos, False)
-            out_sin = self.scratch.head_block_sin(out_sin, False)
-            out_width = self.scratch.head_block_width(out_width, False)
-
+            if self.block_depth > 0:
+                out_pos = self.scratch.head_block_pos(out_pos)
+                out_cos = self.scratch.head_block_cos(out_cos)
+                out_sin = self.scratch.head_block_sin(out_sin)
+                out_width = self.scratch.head_block_width(out_width)
+            else:
+                out_pos = self.scratch.head_block_pos(out)
+                out_cos = self.scratch.head_block_cos(out)
+                out_sin = self.scratch.head_block_sin(out)
+                out_width = self.scratch.head_block_width(out)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
