@@ -239,11 +239,6 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         cos_output = self.scratch.output_conv_cos(out) # [1, 4, 416, 416]
         sin_output = self.scratch.output_conv_sin(out) # [1, 4, 416, 416]
         width_output = self.scratch.output_conv_width(out) # [1, 4, 416, 416]
-
-        pos_output = pos_output.permute(1, 0, 2, 3)
-        cos_output = cos_output.permute(1, 0, 2, 3)
-        sin_output = sin_output.permute(1, 0, 2, 3)
-        width_output = width_output.permute(1, 0, 2, 3)\
         
         print(f"Pos output shape: {pos_output.shape}")
         print(f"Cos output shape: {cos_output.shape}")
