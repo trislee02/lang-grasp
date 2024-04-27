@@ -169,19 +169,19 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
 
         self.text = clip.tokenize(self.labels)    
         
-    def forward(self, x, prompt=''):
+    def forward(self, x_in, prompt=''):
         # Check if x is of type List
-        if isinstance(x, tuple):
-            x = x[0]
-            prompt = x[1]
+        if isinstance(x_in, tuple):
+            x = x_in[0]
+            prompt = list(x_in[1])
 
         if prompt == '':
             text = self.text
         else:
-            text = clip.tokenize(prompt)    
-        
-        # print(f"Text (after tokenize) length: {len(text)}") # 4
-        # print(f"Image shape: {x.shape}") # [1, 3, 416, 416] # 416x416 is the input size
+            text = clip.tokenize(prompt)  
+
+        print(f"Text (after tokenize) length: {len(text)}") # 4
+        print(f"Image shape: {x.shape}") # [1, 3, 416, 416] # 416x416 is the input size
 
         if self.channels_last == True:
             x.contiguous(memory_format=torch.channels_last)
@@ -202,42 +202,54 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         self.logit_scale = self.logit_scale.to(x.device)
         # Encode text features
         text_features = self.clip_pretrained.encode_text(text)
-        # print(f"Text features shape: {text_features.shape}") # [4, 512] # 4 is the number of token in a label
-        
+        text_features = text_features.unsqueeze(1) 
+        assert text_features.shape == (len(text), 1, self.out_c), f"Text features shape: {text_features.shape}"
+        print(f"Text features shape: {text_features.shape}") # [4, 512] # 4 is the number of token in a label
+
         # Get image features
         image_features = self.scratch.head1(path_1)
-        # print(f"Image features shape: {image_features.shape}") # [1, 512, 208, 208] # 208x208 is the W/2xH/2 size of the input
+        print(f"Image features shape: {image_features.shape}") # [1, 512, 208, 208] # 208x208 is the W/2xH/2 size of the input
 
         imshape = image_features.shape
-        image_features = image_features.permute(0,2,3,1).reshape(-1, self.out_c)
-        # print(f"Image features shape (after reshaped and permute): {image_features.shape}") # [43264, 512] 
+        image_features = image_features.permute(0,2,3,1).reshape(imshape[0], -1, self.out_c)
+        print(f"Image features shape (after reshaped and permute): {image_features.shape}") # [43264, 512] 
 
         # normalized features
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         
-        # print(f"Logit scale shape: {self.logit_scale.shape}") # []
+        print(f"Logit scale shape: {self.logit_scale.shape}") # []
 
-        logits_per_image = self.logit_scale * image_features.half() @ text_features.t()
+        logits_per_image = self.logit_scale * image_features.half() @ text_features.mT
 
-        # print(f"Logits per image shape: {logits_per_image.shape}") # [43264, 4]
+        print(f"Logits per image shape: {logits_per_image.shape}") # [43264, 4]
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
 
-        # print(f"Out (before headblock) shape: {out.shape}") # [1, 4, 208, 208]
+        print(f"Out (before headblock) shape: {out.shape}") # [1, 4, 208, 208]
 
         if self.arch_option in [1, 2]:
             for _ in range(self.block_depth - 1):
                 out = self.scratch.head_block(out)
             out = self.scratch.head_block(out, False)
 
-        # print(f"Out (after headblock) shape: {out.shape}") # [1, 4, 208, 208]
+        print(f"Out (after headblock) shape: {out.shape}") # [1, 4, 208, 208]
 
         pos_output = self.scratch.output_conv_pos(out) # [1, 4, 416, 416]
         cos_output = self.scratch.output_conv_cos(out) # [1, 4, 416, 416]
         sin_output = self.scratch.output_conv_sin(out) # [1, 4, 416, 416]
         width_output = self.scratch.output_conv_width(out) # [1, 4, 416, 416]
-            
+
+        pos_output = pos_output.permute(1, 0, 2, 3)
+        cos_output = cos_output.permute(1, 0, 2, 3)
+        sin_output = sin_output.permute(1, 0, 2, 3)
+        width_output = width_output.permute(1, 0, 2, 3)\
+        
+        print(f"Pos output shape: {pos_output.shape}")
+        print(f"Cos output shape: {cos_output.shape}")
+        print(f"Sin output shape: {sin_output.shape}")
+        print(f"Width output shape: {width_output.shape}")
+
         return pos_output, cos_output, sin_output, width_output
 
 class LSegNet(LSeg):
