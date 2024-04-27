@@ -308,13 +308,13 @@ def run():
         raise NotImplementedError('Optimizer {} is not implemented'.format(args.optim))
 
     # Print model architecture.
-    logging.info('Save model architecture...')
-    summary(net, (input_channels, args.input_size, args.input_size))
-    f = open(os.path.join(save_folder, 'arch.txt'), 'w')
-    sys.stdout = f
-    print(summary(net, (input_channels, args.input_size, args.input_size)))
-    sys.stdout = sys.__stdout__
-    f.close()
+    # logging.info('Save model architecture...')
+    # summary(net, (input_channels, args.input_size, args.input_size))
+    # f = open(os.path.join(save_folder, 'arch.txt'), 'w')
+    # sys.stdout = f
+    # summary(net, (input_channels, args.input_size, args.input_size))
+    # sys.stdout = sys.__stdout__
+    # f.close()
 
     best_iou = 0.0
     for epoch in range(args.epochs):
