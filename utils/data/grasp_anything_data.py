@@ -102,3 +102,10 @@ class GraspAnythingDataset(GraspDatasetBase):
         #     rgb_img.normalise()
         #     rgb_img.img = rgb_img.img.transpose((2, 0, 1))
         # return rgb_img.img
+
+    def get_prompt(self, idx):
+        with open(self.prompt_files[idx], 'rb') as f:
+            prompt = pickle.load(f)
+            if not isinstance(prompt, str):
+                raise TypeError(f"Prompt must be a string. Type: {type(prompt)}")
+        return prompt

@@ -47,6 +47,9 @@ class GraspDatasetBase(torch.utils.data.Dataset):
 
     def get_rgb(self, idx, rot=0, zoom=1.0):
         raise NotImplementedError()
+    
+    def get_prompt(self, idx):
+        raise NotImplementedError()
 
     def __getitem__(self, idx):
         if self.random_rotate:
@@ -92,7 +95,9 @@ class GraspDatasetBase(torch.utils.data.Dataset):
         sin = self.numpy_to_torch(np.sin(2 * ang_img))
         width = self.numpy_to_torch(width_img)
 
-        return x, (pos, cos, sin, width), idx, rot, zoom_factor
+        prompt = self.get_prompt(idx)
+
+        return (x, prompt), (pos, cos, sin, width), idx, rot, zoom_factor
 
     def __len__(self):
         return len(self.grasp_files)
