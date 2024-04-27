@@ -169,11 +169,16 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
 
         self.text = clip.tokenize(self.labels)    
         
-    def forward(self, x, labelset=''):
-        if labelset == '':
+    def forward(self, x, prompt=''):
+        # Check if x is of type List
+        if isinstance(x, list):
+            x = x[0]
+            prompt = x[1]
+
+        if prompt == '':
             text = self.text
         else:
-            text = clip.tokenize(labelset)    
+            text = clip.tokenize(prompt)    
         
         # print(f"Text (after tokenize) length: {len(text)}") # 4
         # print(f"Image shape: {x.shape}") # [1, 3, 416, 416] # 416x416 is the input size
