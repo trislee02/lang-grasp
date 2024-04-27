@@ -239,10 +239,10 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         sin_output = self.scratch.output_conv_sin(out) # [batch_size, 1, H, W]
         width_output = self.scratch.output_conv_width(out) # [batch_size, 1, H, W]
 
-        pos_output.requires_grad_(True)
-        cos_output.requires_grad_(True)
-        sin_output.requires_grad_(True)
-        width_output.requires_grad_(True)
+        # pos_output.requires_grad_(True)
+        # cos_output.requires_grad_(True)
+        # sin_output.requires_grad_(True)
+        # width_output.requires_grad_(True)
         
         return pos_output, cos_output, sin_output, width_output
 
