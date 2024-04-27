@@ -316,14 +316,31 @@ def run():
     else:
         raise NotImplementedError('Optimizer {} is not implemented'.format(args.optim))
 
-    # Print model architecture.
-    input_channels = 1 * args.use_depth + 3 * args.use_rgb
-    summary(net, (input_channels, args.input_size, args.input_size))
-    f = open(os.path.join(save_folder, 'arch.txt'), 'w')
-    sys.stdout = f
-    summary(net, (input_channels, args.input_size, args.input_size))
-    sys.stdout = sys.__stdout__
-    f.close()
+    from prettytable import PrettyTable
+
+    def count_parameters(model):
+        table = PrettyTable(["Modules", "Parameters"])
+        total_params = 0
+        for name, parameter in model.named_parameters():
+            if not parameter.requires_grad:
+                continue
+            params = parameter.numel()
+            table.add_row([name, params])
+            total_params += params
+        print(table)
+        print(f"Total Trainable Params: {total_params}")
+        return total_params
+        
+    count_parameters(net)
+
+    # # Print model architecture.
+    # input_channels = 1 * args.use_depth + 3 * args.use_rgb
+    # summary(net, (input_channels, args.input_size, args.input_size))
+    # f = open(os.path.join(save_folder, 'arch.txt'), 'w')
+    # sys.stdout = f
+    # summary(net, (input_channels, args.input_size, args.input_size))
+    # sys.stdout = sys.__stdout__
+    # f.close()
 
     best_iou = 0.0
     for epoch in range(args.epochs):
