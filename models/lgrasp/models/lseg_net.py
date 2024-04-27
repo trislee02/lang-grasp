@@ -171,7 +171,7 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         
     def forward(self, x, prompt=''):
         # Check if x is of type List
-        if isinstance(x, list):
+        if isinstance(x, tuple):
             x = x[0]
             prompt = x[1]
 
