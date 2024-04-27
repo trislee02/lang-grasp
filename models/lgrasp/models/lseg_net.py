@@ -240,10 +240,10 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
                 out_sin = self.scratch.head_block_sin(out)
                 out_width = self.scratch.head_block_width(out)
 
-            out_pos = self.scratch.head_block(out_pos, False)
-            out_cos = self.scratch.head_block(out_cos, False)
-            out_sin = self.scratch.head_block(out_sin, False)
-            out_width = self.scratch.head_block(out_width, False)
+            out_pos = self.scratch.head_block_pos(out_pos, False)
+            out_cos = self.scratch.head_block_cos(out_cos, False)
+            out_sin = self.scratch.head_block_sin(out_sin, False)
+            out_width = self.scratch.head_block_width(out_width, False)
 
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
