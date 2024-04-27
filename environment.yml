@@ -1,0 +1,24 @@
+# This is Conda environment file
+# Usage: `conda env update -f environment.yml`
+
+name: grasping-robot
+dependencies:
+    - python=3.9
+    - pytorch::pytorch=1.12.1
+    - pytorch::torchvision=0.13.1 
+    - pytorch::torchaudio=0.12.1 
+    - cudatoolkit=11.3
+    - pip
+    - pip:
+        - opencv-python
+        - matplotlib
+        - scikit-image
+        - imageio
+        - torch
+        - torchvision
+        - torchsummary
+        - tensorboardX
+        - pyrealsense2
+        - Pillow
+        - numpy==1.19.5
+    
