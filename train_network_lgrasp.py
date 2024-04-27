@@ -316,8 +316,8 @@ def run():
     else:
         raise NotImplementedError('Optimizer {} is not implemented'.format(args.optim))
 
+    # Print model params
     from prettytable import PrettyTable
-
     def count_parameters(model):
         table = PrettyTable(["Modules", "Parameters"])
         total_params = 0
@@ -330,8 +330,14 @@ def run():
         print(table)
         print(f"Total Trainable Params: {total_params}")
         return total_params
-        
+    
+    logging.info('Model Parameters:')
     count_parameters(net)
+    f = open(os.path.join(save_folder, 'arch.txt'), 'w')
+    sys.stdout = f
+    count_parameters(net)
+    sys.stdout = sys.__stdout__
+    f.close()
 
     # # Print model architecture.
     # input_channels = 1 * args.use_depth + 3 * args.use_rgb
