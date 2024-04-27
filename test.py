@@ -41,14 +41,49 @@ class CustomImageDataset(Dataset):
 # logit = logit.view(imshape[0], imshape[2], imshape[3], -1).permute(0, 3, 1, 2)
 # print(logit.shape)
 
-import clip
-text_features = clip.tokenize(["a photo of a dog", "a photo of a cat"])
-print(text_features.shape)
-print(text_features)
+class Interpolate(nn.Module):
+    """Interpolation module."""
 
-text_features = text_features.to('cuda')
-clip_pretrained, _ = clip.load("ViT-B/32", device='cuda', jit=False)
-text_features = clip_pretrained.encode_text(text_features)
-text_features = text_features.unsqueeze(1)
-print(text_features.shape)
-print(text_features)
+    def __init__(self, scale_factor, mode, align_corners=False):
+        """Init.
+
+        Args:
+            scale_factor (float): scaling
+            mode (str): interpolation mode
+        """
+        super(Interpolate, self).__init__()
+
+        self.interp = nn.functional.interpolate
+        self.scale_factor = scale_factor
+        self.mode = mode
+        self.align_corners = align_corners
+
+    def forward(self, x):
+        """Forward pass.
+
+        Args:
+            x (tensor): input
+
+        Returns:
+            tensor: interpolated data
+        """
+
+        x = self.interp(
+            x,
+            scale_factor=self.scale_factor,
+            mode=self.mode,
+            align_corners=self.align_corners,
+        )
+
+        return x
+
+layer = nn.Sequential(
+            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
+        )
+
+x = torch.randn(3, 1, 5, 5)
+print(x.shape)
+print(x)
+x = layer(x)
+print(x.shape)
+print(x)
