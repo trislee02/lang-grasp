@@ -167,6 +167,8 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
             Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
         )
 
+        self.aTest = nn.Conv2d(features, self.out_c, kernel_size=1)
+
         self.text = clip.tokenize(self.labels)    
         
     def forward(self, x_in, prompt=''):
