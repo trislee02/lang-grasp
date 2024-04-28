@@ -81,6 +81,8 @@ def parse_args():
                         help='Batches per Epoch')
     parser.add_argument('--optim', type=str, default='adam',
                         help='Optmizer for the training. (adam or SGD)')
+    parser.add_argument("--accumulate_grad_batches", type=int, default=1,
+                        help="accumulate N batches for gradient computation")
 
     # Logging etc.
     parser.add_argument('--description', type=str, default='',

@@ -23,6 +23,7 @@ def make_trainer(args):
     args.strategy = "ddp"
     args.benchmark = True
     args.sync_batchnorm = True
+    args.max_epochs = args.epochs
 
     trainer = pl.Trainer.from_argparse_args(args)
     return trainer
