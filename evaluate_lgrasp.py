@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
         with torch.no_grad():
             for idx, (x, y, didx, rot, zoom) in enumerate(test_data):
-                xc = x.to(device)
+                xc = (x[0].to(device), x[1])
                 yc = [yi.to(device) for yi in y]
                 lossd = net.model.compute_loss(xc, yc)
 
