@@ -117,6 +117,7 @@ if __name__ == '__main__':
         # net = torch.load(network)
 
         net = LGraspModule.load_from_checkpoint(network)
+        net = net.to(device)
         net.eval()
 
         results = {'correct': 0, 'failed': 0}
