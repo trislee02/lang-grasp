@@ -20,7 +20,7 @@ from inference.post_process import post_process_output
 from utils.data import get_dataset
 from utils.dataset_processing import evaluation
 from utils.visualisation.gridshow import gridshow
-from utils import count_parameters
+from utils import count_parameters, parameters_grad
 
 from models.lgrasp import make_model
 
@@ -188,6 +188,7 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             lossd = net.compute_loss(xc, yc)
             loss = lossd['loss']
 
+
             batch_n = 1
             if batch_idx % batch_n == 0:
                 logging.info('Epoch: {}, Batch: {}, Loss: {:0.4f}'.format(epoch, batch_idx, loss.item()))
@@ -201,7 +202,7 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
+            parameters_grad()
             # Display the images
             if vis:
                 imgs = []
