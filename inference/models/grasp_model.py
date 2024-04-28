@@ -16,17 +16,25 @@ class GraspModel(nn.Module):
     def compute_loss(self, xc, yc):
         # print(f"Input shape: {xc.shape}") # [1, 3, 224, 224]
         y_pos, y_cos, y_sin, y_width = yc
-        pos_pred, cos_pred, sin_pred, width_pred = self(xc)
+        # pos_pred, cos_pred, sin_pred, width_pred = self(xc)
+        pos_pred = self(xc)
         # print(f"Prediction shape: {pos_pred.shape}, {cos_pred.shape}, {sin_pred.shape}, {width_pred.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
         # print(f"Ground truth shape: {y_pos.shape}, {y_cos.shape}, {y_sin.shape}, {y_width.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
 
         p_loss = F.smooth_l1_loss(pos_pred, y_pos)
-        cos_loss = F.smooth_l1_loss(cos_pred, y_cos)
-        sin_loss = F.smooth_l1_loss(sin_pred, y_sin)
-        width_loss = F.smooth_l1_loss(width_pred, y_width)
+        cos_loss = 0.0
+        sin_loss = 0.0
+        width_loss = 0.0
+        cos_pred = None
+        sin_pred = None
+        width_pred = None
+        
+        # cos_loss = F.smooth_l1_loss(cos_pred, y_cos)
+        # sin_loss = F.smooth_l1_loss(sin_pred, y_sin)
+        # width_loss = F.smooth_l1_loss(width_pred, y_width)
 
         return {
-            'loss': p_loss + cos_loss + sin_loss + width_loss,
+            'loss': p_loss, # + cos_loss + sin_loss + width_loss,
             'losses': {
                 'p_loss': p_loss,
                 'cos_loss': cos_loss,
