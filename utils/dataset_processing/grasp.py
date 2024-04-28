@@ -395,7 +395,7 @@ class GraspRectangle:
         :param angle: Angle to rotate (in radians)
         :param center: Point to rotate around (e.g. image center)
         """
-        print(f"Type of center: {type(center)}, type of angle: {type(angle)}")
+        print(f"Type of center: {type(center)}, type of angle: {type(angle)}, angle: {angle}, center: {center}")
         R = np.array(
             [
                 [np.cos(-angle), np.sin(-angle)],
