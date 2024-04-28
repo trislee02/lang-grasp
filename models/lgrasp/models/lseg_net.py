@@ -177,10 +177,11 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         
     def forward(self, x_in, prompt=''):
         # Check if x is of type tuple, i.e. from a dataloader
+        # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size` prompts
         if isinstance(x_in, tuple):
             x = x_in[0].detach().clone()
-            x.requires_grad = False
-
+            x.requires_grad = True
+            
             prompt = list(x_in[1])
 
         if prompt == '':
@@ -206,13 +207,11 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         path_2 = self.scratch.refinenet2(path_3, layer_2_rn)
         path_1 = self.scratch.refinenet1(path_2, layer_1_rn)
 
-        text = text.detach().clone().to(x.device)
-        text.requires_grad = False
-        
+        text = text.to(x.device)
         self.logit_scale = self.logit_scale.to(x.device)
         # Encode text features
         text_features = self.clip_pretrained.encode_text(text)
-        text_features = text_features.unsqueeze(1) 
+        text_features = text_features.unsqueeze(1)
         # print(f"Text features shape: {text_features.shape}") # [batch_size, 1, out_c] 
 
         # Get image features

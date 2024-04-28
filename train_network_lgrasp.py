@@ -183,7 +183,7 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             if batch_idx >= batches_per_epoch:
                 break
 
-            xc = (x[0].to(device), x[1])
+            xc = (x[0].to(device), x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
             yc = [yy.to(device) for yy in y]
             lossd = net.compute_loss(xc, yc)
             loss = lossd['loss']
@@ -202,7 +202,7 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            parameters_grad()
+            parameters_grad(net)
             # Display the images
             if vis:
                 imgs = []
