@@ -1,4 +1,5 @@
 import pytorch_lightning as pl
+import torch.cuda.amp as amp
 
 
 class LGraspModule(pl.LightningModule):
@@ -8,6 +9,9 @@ class LGraspModule(pl.LightningModule):
         self.loss_fn = loss_fn
         self.optimizer = optimizer
         self.scheduler = scheduler
+        
+        self.enabled = False #True mixed precision will make things complicated and leading to NAN error
+        self.scaler = amp.GradScaler(enabled=self.enabled)
 
     def forward(self, x):
         return self.model(x)
@@ -17,8 +21,9 @@ class LGraspModule(pl.LightningModule):
         x, y, _, _, _ = batch
         xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
         yc = [yy for yy in y]
-        lossd = self.loss_fn(xc, yc)
-        loss = lossd['loss']
+        with amp.autocast(enabled=self.enabled):
+            lossd = self.loss_fn(xc, yc)
+            loss = lossd['loss']
         print("Loss: ", loss.item())
         self.log("train_loss", loss)
         return loss

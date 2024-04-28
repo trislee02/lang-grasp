@@ -228,7 +228,7 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         
         # print(f"Logit scale shape: {self.logit_scale.shape}") # []
 
-        logits_per_image = self.logit_scale * image_features.half() @ text_features.mT
+        logits_per_image = self.logit_scale * image_features @ text_features.mT
 
         # print(f"Logits per image shape: {logits_per_image.shape}") # [batch_size, H/2 * W/2, 1]
 
