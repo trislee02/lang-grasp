@@ -179,7 +179,7 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         # Check if x is of type tuple, i.e. from a dataloader
         if isinstance(x_in, tuple):
             x = x_in[0].detach().clone()
-            x.requires_grad = True
+            x.requires_grad = False
 
             prompt = list(x_in[1])
 
@@ -207,6 +207,8 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         path_1 = self.scratch.refinenet1(path_2, layer_1_rn)
 
         text = text.detach().clone().to(x.device)
+        text.requires_grad = False
+        
         self.logit_scale = self.logit_scale.to(x.device)
         # Encode text features
         text_features = self.clip_pretrained.encode_text(text)
@@ -258,8 +260,6 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
         sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
         width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
-
-        
 
         return pos_output, cos_output, sin_output, width_output
 
