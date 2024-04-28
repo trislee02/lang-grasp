@@ -39,7 +39,6 @@ class LGraspModule(pl.LightningModule):
         print("Epoch end", outs)
 
     def validation_step(self, batch, batch_idx):
-        print(f"Batch #{batch_idx}")
         x, y, didx, rot, zoom_factor = batch
         xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
         yc = [yy for yy in y]
@@ -48,6 +47,9 @@ class LGraspModule(pl.LightningModule):
         self.log("val_loss", loss)
 
         # Update the accuracy metric
+        didx = didx.cpu()
+        rot = rot.cpu()
+        zoom_factor = zoom_factor.cpu()
         self.val_accuracy.update(lossd, didx, rot, zoom_factor)
 
         return loss

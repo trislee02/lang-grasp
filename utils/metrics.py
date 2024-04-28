@@ -24,7 +24,7 @@ class GraspAccuracy:
                                             self.dataset.get_gtbb(didx, rot, zoom_factor),
                                             no_grasps=1,
                                             grasp_width=w_out,
-                                            threshold=self.iou_threshold
+                                            threshold=self.iou_threshold,
                                             )
 
         if s:
