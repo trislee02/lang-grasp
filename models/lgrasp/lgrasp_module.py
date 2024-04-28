@@ -24,9 +24,12 @@ class LGraspModule(pl.LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
-        x, y = batch
-        y_hat = self.model(x)
-        loss = self.loss_fn(y_hat, y)
+        x, y, _, _, _ = batch
+        xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
+        yc = [yy for yy in y]
+        lossd = self.loss_fn(xc, yc)
+        loss = lossd['loss']
+        print("Val loss: ", loss.item())
         self.log("val_loss", loss)
         return loss
 
