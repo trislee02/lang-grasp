@@ -236,33 +236,33 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         if self.arch_option in [1, 2]:
             for _ in range(self.block_depth - 1):
                 out_pos = self.scratch.head_block_pos(out)
-                # out_cos = self.scratch.head_block_cos(out)
-                # out_sin = self.scratch.head_block_sin(out)
-                # out_width = self.scratch.head_block_width(out)
+                out_cos = self.scratch.head_block_cos(out)
+                out_sin = self.scratch.head_block_sin(out)
+                out_width = self.scratch.head_block_width(out)
             if self.block_depth > 0:
                 out_pos = self.scratch.head_block_pos(out_pos)
-                # out_cos = self.scratch.head_block_cos(out_cos)
-                # out_sin = self.scratch.head_block_sin(out_sin)
-                # out_width = self.scratch.head_block_width(out_width)
+                out_cos = self.scratch.head_block_cos(out_cos)
+                out_sin = self.scratch.head_block_sin(out_sin)
+                out_width = self.scratch.head_block_width(out_width)
             else:
                 out_pos = self.scratch.head_block_pos(out)
-                # out_cos = self.scratch.head_block_cos(out)
-                # out_sin = self.scratch.head_block_sin(out)
-                # out_width = self.scratch.head_block_width(out)
+                out_cos = self.scratch.head_block_cos(out)
+                out_sin = self.scratch.head_block_sin(out)
+                out_width = self.scratch.head_block_width(out)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
         pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
-        # cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
-        # sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
-        # width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
+        cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
+        sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
+        width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
 
         # pos_output.requires_grad_(True)
         # cos_output.requires_grad_(True)
         # sin_output.requires_grad_(True)
         # width_output.requires_grad_(True)
 
-        return pos_output #, cos_output, sin_output, width_output
+        return pos_output, cos_output, sin_output, width_output
 
 class LSegNet(LSeg):
     """Network for semantic segmentation."""

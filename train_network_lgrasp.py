@@ -192,14 +192,14 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             if batch_idx % batch_n == 0:
                 logging.info('Epoch: {}, Batch: {}, Loss: {:0.4f}'.format(epoch, batch_idx, loss.item()))
 
-            # results['loss'] += loss.item()
-            # for ln, l in lossd['losses'].items():
-            #     if ln not in results['losses']:
-            #         results['losses'][ln] = 0
-            #     results['losses'][ln] += l.item()
+            results['loss'] += loss.item()
+            for ln, l in lossd['losses'].items():
+                if ln not in results['losses']:
+                    results['losses'][ln] = 0
+                results['losses'][ln] += l.item()
 
             optimizer.zero_grad()
-            loss.backward()
+            loss.backward(retain_graph=True)
             optimizer.step()
 
             # Display the images
