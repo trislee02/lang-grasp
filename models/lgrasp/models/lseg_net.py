@@ -253,10 +253,10 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
         with torch.no_grad():
-            out_pos = self.scratch.output_conv_pos(out_pos)
-            out_cos = self.scratch.output_conv_cos(out_cos)
-            out_sin = self.scratch.output_conv_sin(out_sin)
-            out_width = self.scratch.output_conv_width(out_width)
+            pos_output = self.scratch.output_conv_pos(out_pos)
+            cos_output = self.scratch.output_conv_cos(out_cos)
+            sin_output = self.scratch.output_conv_sin(out_sin)
+            width_output = self.scratch.output_conv_width(out_width)
         # pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
         # cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
         # sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
