@@ -30,7 +30,7 @@ def parse_args():
                         help='Dataset Name ("cornell" or "jaquard")')
     parser.add_argument('--dataset-path', type=str,
                         help='Path to dataset')
-    parser.add_argument('--use-depth', type=int, default=1,
+    parser.add_argument('--use-depth', type=int, default=0,
                         help='Use Depth image for evaluation (1/0)')
     parser.add_argument('--use-rgb', type=int, default=1,
                         help='Use RGB image for evaluation (1/0)')
@@ -42,7 +42,7 @@ def parse_args():
                         help='Shuffle the dataset')
     parser.add_argument('--ds-rotate', type=float, default=0.0,
                         help='Shift the start point of the dataset to use a different test/train split')
-    parser.add_argument('--num-workers', type=int, default=8,
+    parser.add_argument('--num-workers', type=int, default=-1,
                         help='Dataset workers')
 
     # Evaluation
