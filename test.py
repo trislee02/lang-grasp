@@ -1,89 +1,49 @@
 import torch
-from torch.utils.data import Dataset, DataLoader
-import os
-import pandas as pd
-from torchvision.io import read_image
 import torch.nn as nn
-import numpy as np
 
-class CustomImageDataset(Dataset):
-    def __init__(self):
-        pass
+sft = nn.functional.softmax 
 
-    def __len__(self):
-        return 100
+def forward(StateVec,ConnectMatrix,L):
+    StateVec = StateVec + (2*(-1/8*StateVec - ConnectMatrix.mm(StateVec)))*0.1
+    pos = L.mm(sft(StateVec, dim=0))
+    return StateVec, pos
 
-    def __getitem__(self, idx):
-        image = torch.zeros([3, 224, 224], dtype=torch.float32)
-        prompt = "Image ne"
-        label = 0
-        return (image, prompt), label
-    
+N = 6
 
-# dataset = CustomImageDataset()
-# data_loader = DataLoader(dataset, batch_size=2, shuffle=True)
+"""Toy target"""
+target = torch.randn(2,20)
 
-# for (image, prompt), label in data_loader:
-#     print(type(image), type(prompt), type(label))
-#     print(image.shape, prompt, label)
-
-# c_dim = 3
-# text_features = torch.randint(0, 100, size=(2, c_dim))
-# image_features = torch.randint(0, 100, size=(2, c_dim, 5, 5))
-# imshape = image_features.shape
-# image_features = image_features.permute(0, 2, 3, 1).reshape(imshape[0], -1, c_dim)
-# print(image_features.shape)
-# print(image_features)
+"""Randomly initialise L (which ought to be inferred later)"""
+L = torch.randn(2,N)
+L.requires_grad_(True)
 
 
-# logit = image_features @ text_features.mT
-# print(logit.shape)
-# logit = logit.view(imshape[0], imshape[2], imshape[3], -1).permute(0, 3, 1, 2)
-# print(logit.shape)
+"""Produce Connectivity Matrix rho"""
+rho = torch.zeros(N,N);
+for i in range(N):
+    for j in range(N):
+        if i == j:
+            rho[i, j] = 0
+        elif j == i + 1:
+            rho[i, j] = 1.5
+        elif j == i - 1:
+            rho[i, j] = 0.5
+        else:
+            rho[i, j] = 1
 
-class Interpolate(nn.Module):
-    """Interpolation module."""
+rho[-1, 0] = 1.5
+rho[0, -1] = 0.5
 
-    def __init__(self, scale_factor, mode, align_corners=False):
-        """Init.
+"""Initialise state vector as states = [0.5,0,0,...]"""
+states = torch.Tensor(N,1)
+states[0] = 0.5
+states.requires_grad_(True)
 
-        Args:
-            scale_factor (float): scaling
-            mode (str): interpolation mode
-        """
-        super(Interpolate, self).__init__()
-
-        self.interp = nn.functional.interpolate
-        self.scale_factor = scale_factor
-        self.mode = mode
-        self.align_corners = align_corners
-
-    def forward(self, x):
-        """Forward pass.
-
-        Args:
-            x (tensor): input
-
-        Returns:
-            tensor: interpolated data
-        """
-
-        x = self.interp(
-            x,
-            scale_factor=self.scale_factor,
-            mode=self.mode,
-            align_corners=self.align_corners,
-        )
-
-        return x
-
-layer = nn.Sequential(
-            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
-        )
-
-x = torch.randn(3, 1, 5, 5)
-print(x.shape)
-print(x)
-x = layer(x)
-print(x.shape)
-print(x)
+lr = 0.1 # Learning Rate
+for t in range(0, target.shape[1]):
+    states, pos = forward(states,rho,L)
+    loss = torch.sum((pos - target[:,t].float().view([2,1]))**2)
+    loss.backward()
+    L.data -= L.grad.data * lr
+    print(f"Loss: {loss.item()}")
+    L.grad.data.zero_()

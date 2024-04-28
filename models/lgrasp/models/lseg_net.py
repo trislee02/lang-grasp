@@ -178,7 +178,9 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
     def forward(self, x_in, prompt=''):
         # Check if x is of type tuple, i.e. from a dataloader
         if isinstance(x_in, tuple):
-            x = x_in[0]
+            x = x_in[0].detach().clone()
+            x.requires_grad = True
+
             prompt = list(x_in[1])
 
         if prompt == '':
@@ -204,7 +206,7 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         path_2 = self.scratch.refinenet2(path_3, layer_2_rn)
         path_1 = self.scratch.refinenet1(path_2, layer_1_rn)
 
-        text = text.to(x.device)
+        text = text.detach().clone().to(x.device)
         self.logit_scale = self.logit_scale.to(x.device)
         # Encode text features
         text_features = self.clip_pretrained.encode_text(text)
@@ -252,20 +254,12 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        with torch.no_grad():
-            pos_output = self.scratch.output_conv_pos(out_pos)
-            cos_output = self.scratch.output_conv_cos(out_cos)
-            sin_output = self.scratch.output_conv_sin(out_sin)
-            width_output = self.scratch.output_conv_width(out_width)
-        # pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
-        # cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
-        # sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
-        # width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
+        pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
+        cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
+        sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
+        width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
 
-        # pos_output.requires_grad_(True)
-        # cos_output.requires_grad_(True)
-        # sin_output.requires_grad_(True)
-        # width_output.requires_grad_(True)
+        
 
         return pos_output, cos_output, sin_output, width_output
 
