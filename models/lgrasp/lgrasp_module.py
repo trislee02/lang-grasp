@@ -47,9 +47,9 @@ class LGraspModule(pl.LightningModule):
         self.log("val_loss", loss)
 
         # Update the accuracy metric
-        didx = didx.cpu()
-        rot = rot.cpu()
-        zoom_factor = zoom_factor.cpu()
+        didx = didx.item()
+        rot = rot.item()
+        zoom_factor = zoom_factor.item()
         self.val_accuracy.update(lossd, didx, rot, zoom_factor)
 
         return loss
