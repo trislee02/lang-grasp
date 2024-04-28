@@ -1,8 +1,7 @@
 import torch
 import torch.cuda.amp as amp
 import pytorch_lightning as pl
-from inference.post_process import post_process_output
-from utils.dataset_processing import evaluation
+from utils.metrics import GraspAccuracy
 
 class LGraspModule(pl.LightningModule):
     def __init__(self, 
@@ -16,6 +15,7 @@ class LGraspModule(pl.LightningModule):
         self.loss_fn = loss_fn
         self.base_lr = base_lr
         self.dataset = dataset
+        self.val_accuracy = GraspAccuracy(dataset=dataset)
         
         self.epochs = max_epochs
         self.enabled = False #True mixed precision will make things complicated and leading to NAN error
@@ -45,32 +45,17 @@ class LGraspModule(pl.LightningModule):
         yc = [yy for yy in y]
         lossd = self.loss_fn(xc, yc)
         loss = lossd['loss']
-
-        # results = {
-        #             'correct': 0,
-        #             'failed': 0,
-        #             'loss': 0,
-        #             'losses': {}
-        #         }
-
-        # q_out, ang_out, w_out = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
-        #                                                 lossd['pred']['sin'], lossd['pred']['width'])
-
-        # s = evaluation.calculate_iou_match(q_out,
-        #                                     ang_out,
-        #                                     self.dataset.get_gtbb(didx, rot, zoom_factor),
-        #                                     no_grasps=1,
-        #                                     grasp_width=w_out,
-        #                                     threshold=0.25
-        #                                     )
-
-        # if s:
-        #     results['correct'] += 1
-        # else:
-        #     results['failed'] += 1
-
         self.log("val_loss", loss)
+
+        # Update the accuracy metric
+        self.val_accuracy.update(lossd, didx, rot, zoom_factor)
+
         return loss
+    
+    def validation_epoch_end(self, outs):
+        # Log the accuracy metric
+        self.log("val_accuracy", self.val_accuracy.results['correct'] / (self.val_accuracy.results['correct'] + self.val_accuracy.results['failed']))
+        self.val_accuracy.reset()
 
     def configure_optimizers(self):
         params_list = [
