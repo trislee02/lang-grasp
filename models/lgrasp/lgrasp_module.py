@@ -31,4 +31,4 @@ class LGraspModule(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        return [self.optimizer], [self.scheduler]
+        return self.optimizer
