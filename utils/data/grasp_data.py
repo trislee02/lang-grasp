@@ -97,7 +97,8 @@ class GraspDatasetBase(torch.utils.data.Dataset):
 
         prompt = self.get_prompt(idx)
 
-        return (x, prompt), (pos, cos, sin, width), idx, rot, zoom_factor
+        # return (x, prompt), (pos, cos, sin, width), idx, rot, zoom_factor
+        return x, (pos, cos, sin, width), idx, rot, zoom_factor
 
     def __len__(self):
         return len(self.grasp_files)
