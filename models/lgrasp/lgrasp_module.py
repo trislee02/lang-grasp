@@ -1,15 +1,18 @@
-import pytorch_lightning as pl
+import torch
 import torch.cuda.amp as amp
+import pytorch_lightning as pl
 
 
 class LGraspModule(pl.LightningModule):
-    def __init__(self, model, loss_fn, optimizer, scheduler):
+    def __init__(self, model, loss_fn, optimizer, scheduler, max_epochs=100, base_lr=4e-3):
         super().__init__()
         self.model = model
         self.loss_fn = loss_fn
         self.optimizer = optimizer
         self.scheduler = scheduler
+        self.base_lr = base_lr
         
+        self.epochs = max_epochs
         self.enabled = False #True mixed precision will make things complicated and leading to NAN error
         self.scaler = amp.GradScaler(enabled=self.enabled)
 
@@ -39,4 +42,47 @@ class LGraspModule(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        return self.optimizer
+        params_list = [
+            {"params": self.model.pretrained.parameters(), "lr": self.base_lr},
+        ]
+        if hasattr(self.model, "scratch"):
+            print("Found output scratch")
+            params_list.append(
+                {"params": self.model.scratch.parameters(), "lr": self.base_lr * 10}
+            )
+        if hasattr(self.model, "auxlayer"):
+            print("Found auxlayer")
+            params_list.append(
+                {"params": self.model.auxlayer.parameters(), "lr": self.base_lr * 10}
+            )
+        if hasattr(self.model, "scale_inv_conv"):
+            print(self.model.scale_inv_conv)
+            print("Found scaleinv layers")
+            params_list.append(
+                {
+                    "params": self.model.scale_inv_conv.parameters(),
+                    "lr": self.base_lr * 10,
+                }
+            )
+            params_list.append(
+                {"params": self.model.scale2_conv.parameters(), "lr": self.base_lr * 10}
+            )
+            params_list.append(
+                {"params": self.model.scale3_conv.parameters(), "lr": self.base_lr * 10}
+            )
+            params_list.append(
+                {"params": self.model.scale4_conv.parameters(), "lr": self.base_lr * 10}
+            )
+
+        
+        opt = torch.optim.SGD(
+            params_list,
+            lr=self.base_lr,
+            momentum=0.9,
+            weight_decay=1e-4,
+        )
+        sch = torch.optim.lr_scheduler.LambdaLR(
+            opt, lambda x: pow(1.0 - x / self.epochs, 0.9)
+        )
+
+        return [opt], [sch]

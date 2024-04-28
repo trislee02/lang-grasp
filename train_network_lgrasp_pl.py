@@ -308,7 +308,6 @@ def run():
     # Debugging
     logging.info('Loading network...')
     net = make_model(args)
-    # net = net.to(device)
 
     if args.optim.lower() == 'adam':
         optimizer = optim.Adam(net.parameters())
@@ -317,13 +316,13 @@ def run():
     else:
         raise NotImplementedError('Optimizer {} is not implemented'.format(args.optim))
 
-    # Print model params    
-    f = open(os.path.join(save_folder, 'arch.txt'), 'w')
-    sys.stdout = f
-    trainable_params_count = count_parameters(net)
-    sys.stdout = sys.__stdout__
-    f.close()
-    logging.info('Trainable Parameters: {}'.format(trainable_params_count))
+    # # Print model params    
+    # f = open(os.path.join(save_folder, 'arch.txt'), 'w')
+    # sys.stdout = f
+    # trainable_params_count = count_parameters(net)
+    # sys.stdout = sys.__stdout__
+    # f.close()
+    # logging.info('Trainable Parameters: {}'.format(trainable_params_count))
 
     # Set up Pytorch Lightning Module
     model = LGraspModule(net, net.compute_loss, optimizer, None)

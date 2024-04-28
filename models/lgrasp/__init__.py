@@ -3,7 +3,7 @@ from .lgrasp_module import LGraspModule
 
 def make_model(args):
     net = LSegNet(
-            labels='',
+            labels=[''],
             backbone=args.backbone,
             features=args.num_features,
             crop_size=224,
