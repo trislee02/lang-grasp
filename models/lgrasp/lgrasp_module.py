@@ -2,24 +2,39 @@ import torch
 import torch.cuda.amp as amp
 import pytorch_lightning as pl
 from utils.metrics import GraspAccuracy
+from .models.lseg_net import LSegNet
 
 class LGraspModule(pl.LightningModule):
     def __init__(self, 
-                 model, 
-                 loss_fn, 
-                 dataset,
+                 dataset=None,
                  max_epochs=100, 
-                 base_lr=4e-3):
+                 base_lr=4e-3,
+                 backbone='clip_vitl16_384',
+                 num_features=256,
+                 arch_option=0,
+                 block_depth=0,
+                 activation='lrelu',):
         super().__init__()
-        self.model = model
-        self.loss_fn = loss_fn
+        self.model = LSegNet(
+            labels=[''],
+            backbone=backbone,
+            features=num_features,
+            crop_size=224,
+            arch_option=arch_option,
+            block_depth=block_depth,
+            activation=activation,
+        )
+        self.loss_fn = self.model.compute_loss
         self.base_lr = base_lr
-        self.dataset = dataset
-        self.val_accuracy = GraspAccuracy(dataset=dataset)
+        if dataset:
+            self.dataset = dataset
+            self.val_accuracy = GraspAccuracy(dataset=dataset)
         
         self.epochs = max_epochs
         self.enabled = False #True mixed precision will make things complicated and leading to NAN error
         self.scaler = amp.GradScaler(enabled=self.enabled)
+
+        self.save_hyperparameters()
 
     def forward(self, x):
         return self.model(x)

@@ -185,7 +185,14 @@ def run():
     net = make_model(args)
 
     # Set up Pytorch Lightning Module
-    model = LGraspModule(net, net.compute_loss, dataset)
+    model = LGraspModule(dataset=dataset,
+                         max_epochs=args.epochs,
+                         base_lr=4e-3,
+                         backbone=args.backbone,
+                         num_features=args.num_features,
+                         arch_option=args.arch_option,
+                         block_depth=args.block_depth,
+                         activation=args.activation,)
 
     # Set up Pytorch Lightning Trainer
     trainer = make_trainer(args)
