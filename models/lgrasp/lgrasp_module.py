@@ -45,28 +45,28 @@ class LGraspModule(pl.LightningModule):
         lossd = self.loss_fn(xc, yc)
         loss = lossd['loss']
 
-        results = {
-                    'correct': 0,
-                    'failed': 0,
-                    'loss': 0,
-                    'losses': {}
-                }
+        # results = {
+        #             'correct': 0,
+        #             'failed': 0,
+        #             'loss': 0,
+        #             'losses': {}
+        #         }
 
-        q_out, ang_out, w_out = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
-                                                        lossd['pred']['sin'], lossd['pred']['width'])
+        # q_out, ang_out, w_out = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
+        #                                                 lossd['pred']['sin'], lossd['pred']['width'])
 
-        s = evaluation.calculate_iou_match(q_out,
-                                            ang_out,
-                                            self.dataset.get_gtbb(didx, rot, zoom_factor),
-                                            no_grasps=1,
-                                            grasp_width=w_out,
-                                            threshold=0.25
-                                            )
+        # s = evaluation.calculate_iou_match(q_out,
+        #                                     ang_out,
+        #                                     self.dataset.get_gtbb(didx, rot, zoom_factor),
+        #                                     no_grasps=1,
+        #                                     grasp_width=w_out,
+        #                                     threshold=0.25
+        #                                     )
 
-        if s:
-            results['correct'] += 1
-        else:
-            results['failed'] += 1
+        # if s:
+        #     results['correct'] += 1
+        # else:
+        #     results['failed'] += 1
 
         self.log("val_loss", loss)
         return loss
