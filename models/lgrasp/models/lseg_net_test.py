@@ -11,8 +11,6 @@ import numpy as np
 import pandas as pd
 import os
 
-from inference.models.grasp_model import GraspModel
-
 class depthwise_clipseg_conv(nn.Module):
     def __init__(self):
         super(depthwise_clipseg_conv, self).__init__()
@@ -103,7 +101,7 @@ def _make_fusion_block(features, use_bn):
         align_corners=True,
     )
 
-class LSeg(GraspModel): # Origin: LSeg(BaseModel)
+class LSeg(BaseModel):
     def __init__(
         self,
         features=256,
@@ -148,49 +146,22 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
 
         self.arch_option = kwargs["arch_option"]
         if self.arch_option == 1:
-            self.scratch.head_block_pos = bottleneck_block(activation=kwargs["activation"])
-            self.scratch.head_block_cos = bottleneck_block(activation=kwargs["activation"])
-            self.scratch.head_block_sin = bottleneck_block(activation=kwargs["activation"])
-            self.scratch.head_block_width = bottleneck_block(activation=kwargs["activation"])
+            self.scratch.head_block = bottleneck_block(activation=kwargs["activation"])
             self.block_depth = kwargs['block_depth']
         elif self.arch_option == 2:
-            self.scratch.head_block_pos = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_cos = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_sin = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_width = depthwise_block(activation=kwargs["activation"])
+            self.scratch.head_block = depthwise_block(activation=kwargs["activation"])
             self.block_depth = kwargs['block_depth']
-
-        self.scratch.output_conv_pos = nn.Sequential(
-            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
-        )
-        self.scratch.output_conv_cos = nn.Sequential(
-            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
-        )
-        self.scratch.output_conv_sin = nn.Sequential(
-            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
-        )
-        self.scratch.output_conv_width = nn.Sequential(
-            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
-        )
 
         self.text = clip.tokenize(self.labels)    
         
-    def forward(self, x_in, prompt=''):
-        # Check if x is of type tuple, i.e. from a dataloader
-        # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size` prompts
-        with torch.no_grad():
-            if isinstance(x_in, tuple):
-                x = x_in[0] #.detach().clone()
-                # x.requires_grad = True
-                prompt = list(x_in[1])
-                
-        if prompt == '':
+    def forward(self, x, labelset=''):
+        if labelset == '':
             text = self.text
         else:
-            text = clip.tokenize(prompt)  
-
-        # print(f"Text (after tokenize) length: {len(text)}") # = batch_size
-        # print(f"Image shape: {x.shape}") # [batch_size, 3, H, W] # HxW is the input size
+            text = clip.tokenize(labelset)    
+        
+        # print(f"Text (after tokenize) length: {len(text)}") # 4
+        # print(f"Image shape: {x.shape}") # [1, 3, 416, 416] # 416x416 is the input size
 
         if self.channels_last == True:
             x.contiguous(memory_format=torch.channels_last)
@@ -211,16 +182,15 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         self.logit_scale = self.logit_scale.to(x.device)
         # Encode text features
         text_features = self.clip_pretrained.encode_text(text)
-        text_features = text_features.unsqueeze(1)
-        # print(f"Text features shape: {text_features.shape}") # [batch_size, 1, out_c] 
+        # print(f"Text features shape: {text_features.shape}") # [4, 512] # 4 is the number of token in a label
 
         # Get image features
         image_features = self.scratch.head1(path_1)
-        # print(f"Image features shape: {image_features.shape}") # [batch_size, out_c, H/2, W/2]
+        # print(f"Image features shape: {image_features.shape}") # [1, 512, 208, 208] # 208x208 is the W/2xH/2 size of the input
 
         imshape = image_features.shape
-        image_features = image_features.permute(0,2,3,1).reshape(imshape[0], -1, self.out_c)
-        # print(f"Image features shape (after reshaped and permute): {image_features.shape}") # [batch_size, H/2 * W/2, out_c] 
+        image_features = image_features.permute(0,2,3,1).reshape(-1, self.out_c)
+        # print(f"Image features shape (after reshaped and permute): {image_features.shape}") # [43264, 512] 
 
         # normalized features
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
@@ -228,43 +198,28 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         
         # print(f"Logit scale shape: {self.logit_scale.shape}") # []
 
-        logits_per_image = self.logit_scale * image_features.half() @ text_features.mT
+        logits_per_image = self.logit_scale * image_features.half() @ text_features.t()
+        # print(f"Logits per image shape: {logits_per_image.shape}") # [43264, 4]
 
-        # print(f"Logits per image shape: {logits_per_image.shape}") # [batch_size, H/2 * W/2, 1]
+        out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2) 
 
-        out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
-
-        # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
+        # print(f"Out (before headblock) shape: {out.shape}") # [1, 4, 208, 208]
 
         if self.arch_option in [1, 2]:
             for _ in range(self.block_depth - 1):
-                out_pos = self.scratch.head_block_pos(out)
-                out_cos = self.scratch.head_block_cos(out)
-                out_sin = self.scratch.head_block_sin(out)
-                out_width = self.scratch.head_block_width(out)
-            if self.block_depth > 1:
-                out_pos = self.scratch.head_block_pos(out_pos)
-                out_cos = self.scratch.head_block_cos(out_cos)
-                out_sin = self.scratch.head_block_sin(out_sin)
-                out_width = self.scratch.head_block_width(out_width)
-            else:
-                out_pos = self.scratch.head_block_pos(out)
-                out_cos = self.scratch.head_block_cos(out)
-                out_sin = self.scratch.head_block_sin(out)
-                out_width = self.scratch.head_block_width(out)
+                out = self.scratch.head_block(out)
+            out = self.scratch.head_block(out, False)
 
-        # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
+        # print(f"Out (after headblock) shape: {out.shape}") # [1, 4, 208, 208]
 
-        pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
-        cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
-        sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
-        width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
+        out = self.scratch.output_conv(out)
 
-        return pos_output, cos_output, sin_output, width_output
+        return out
+
 
 class LSegNet(LSeg):
     """Network for semantic segmentation."""
-    def __init__(self, labels, path=None, scale_factor=0.5, crop_size=480, **kwargs):
+    def __init__(self, labels, path=None, scale_factor=0.5, crop_size=224, **kwargs):
 
         features = kwargs["features"] if "features" in kwargs else 256
         kwargs["use_bn"] = True
@@ -274,6 +229,14 @@ class LSegNet(LSeg):
         self.labels = labels
 
         super().__init__(**kwargs)
+
+        self.scratch.output_conv = nn.Sequential(
+            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
+        )
+        self.pretrained.model.patch_embed.img_size = (
+            self.crop_size,
+            self.crop_size,
+        )
 
         if path is not None:
             self.load(path)

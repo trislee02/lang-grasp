@@ -23,7 +23,9 @@ from utils.visualisation.gridshow import gridshow
 from utils import count_parameters, parameters_grad
 
 from models.lgrasp import make_model
+from models.lgrasp import LGraspModule
 
+import pytorch_lightning as pl
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train network')
@@ -319,42 +321,48 @@ def run():
         raise NotImplementedError('Optimizer {} is not implemented'.format(args.optim))
 
     # Print model params    
-    logging.info('Model Parameters:')
     f = open(os.path.join(save_folder, 'arch.txt'), 'w')
     sys.stdout = f
     trainable_params_count = count_parameters(net)
     sys.stdout = sys.__stdout__
     f.close()
-
     logging.info('Trainable Parameters: {}'.format(trainable_params_count))
 
-    best_iou = 0.0
-    for epoch in range(args.epochs):
-        logging.info('Beginning Epoch {:02d}'.format(epoch))
-        train_results = train(epoch, net, device, train_data, optimizer, args.batches_per_epoch, vis=args.vis)
+    # Set up Pytorch Lightning Module
+    model = LGraspModule(net, net.compute_loss, optimizer, None)
 
-        # Log training losses to tensorboard
-        tb.add_scalar('loss/train_loss', train_results['loss'], epoch)
-        for n, l in train_results['losses'].items():
-            tb.add_scalar('train_loss/' + n, l, epoch)
+    # Fit model using train and val dataloader
+    trainer = pl.Trainer(max_epochs=args.epochs)
+    trainer.fit(model, train_data, val_data)
 
-        # Run Validation
-        logging.info('Validating...')
-        test_results = validate(net, device, val_data, args.iou_threshold)
-        logging.info('%d/%d = %f' % (test_results['correct'], test_results['correct'] + test_results['failed'],
-                                     test_results['correct'] / (test_results['correct'] + test_results['failed'])))
 
-        # Log validation results to tensorbaord
-        tb.add_scalar('loss/IOU', test_results['correct'] / (test_results['correct'] + test_results['failed']), epoch)
-        tb.add_scalar('loss/val_loss', test_results['loss'], epoch)
-        for n, l in test_results['losses'].items():
-            tb.add_scalar('val_loss/' + n, l, epoch)
+    # best_iou = 0.0
+    # for epoch in range(args.epochs):
+    #     logging.info('Beginning Epoch {:02d}'.format(epoch))
+    #     train_results = train(epoch, net, device, train_data, optimizer, args.batches_per_epoch, vis=args.vis)
 
-        # Save best performing network
-        iou = test_results['correct'] / (test_results['correct'] + test_results['failed'])
-        if iou > best_iou or epoch == 0 or (epoch % 10) == 0:
-            torch.save(net, os.path.join(save_folder, 'epoch_%02d_iou_%0.2f' % (epoch, iou)))
-            best_iou = iou
+    #     # Log training losses to tensorboard
+    #     tb.add_scalar('loss/train_loss', train_results['loss'], epoch)
+    #     for n, l in train_results['losses'].items():
+    #         tb.add_scalar('train_loss/' + n, l, epoch)
+
+    #     # Run Validation
+    #     logging.info('Validating...')
+    #     test_results = validate(net, device, val_data, args.iou_threshold)
+    #     logging.info('%d/%d = %f' % (test_results['correct'], test_results['correct'] + test_results['failed'],
+    #                                  test_results['correct'] / (test_results['correct'] + test_results['failed'])))
+
+    #     # Log validation results to tensorbaord
+    #     tb.add_scalar('loss/IOU', test_results['correct'] / (test_results['correct'] + test_results['failed']), epoch)
+    #     tb.add_scalar('loss/val_loss', test_results['loss'], epoch)
+    #     for n, l in test_results['losses'].items():
+    #         tb.add_scalar('val_loss/' + n, l, epoch)
+
+    #     # Save best performing network
+    #     iou = test_results['correct'] / (test_results['correct'] + test_results['failed'])
+    #     if iou > best_iou or epoch == 0 or (epoch % 10) == 0:
+    #         torch.save(net, os.path.join(save_folder, 'epoch_%02d_iou_%0.2f' % (epoch, iou)))
+    #         best_iou = iou
 
 
 if __name__ == '__main__':

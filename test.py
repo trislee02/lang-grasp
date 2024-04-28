@@ -1,49 +1,37 @@
 import torch
-import torch.nn as nn
+from models.lgrasp.models.lseg_net_test import LSegNet
+import torch.cuda.amp as amp
+from torchviz import make_dot, make_dot_from_trace
 
-sft = nn.functional.softmax 
+net = LSegNet(labels=['a', 'b'], arch_option=1, activation='lrelu', block_depth=1, backbone='clip_vitl16_384', num_features=256).cuda()
 
-def forward(StateVec,ConnectMatrix,L):
-    StateVec = StateVec + (2*(-1/8*StateVec - ConnectMatrix.mm(StateVec)))*0.1
-    pos = L.mm(sft(StateVec, dim=0))
-    return StateVec, pos
+optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
 
-N = 6
+x = torch.rand(3, 3, 224, 224).cuda()
+prompts = ['a', 'b', 'c']
 
-"""Toy target"""
-target = torch.randn(2,20)
+scaler = amp.GradScaler(enabled=False)
 
-"""Randomly initialise L (which ought to be inferred later)"""
-L = torch.randn(2,N)
-L.requires_grad_(True)
+for i in range(10):
+    # pos_pred, cos_pred, sin_pred, width_pred = net(x)
+    
+    pos_target = torch.rand(3, 1, 224, 224).cuda()
+    cos_target = torch.rand(3, 1, 224, 224).cuda()
+    sin_target = torch.rand(3, 1, 224, 224).cuda()
+    width_target = torch.rand(3, 1, 224, 224).cuda()
 
+    # loss = (torch.sum(pos_pred - pos_target))**2 + (torch.sum(cos_pred - cos_target))**2 + (torch.sum(sin_pred - sin_target))**2 + (torch.sum(width_pred - width_target))**2
+    optimizer.zero_grad()
 
-"""Produce Connectivity Matrix rho"""
-rho = torch.zeros(N,N);
-for i in range(N):
-    for j in range(N):
-        if i == j:
-            rho[i, j] = 0
-        elif j == i + 1:
-            rho[i, j] = 1.5
-        elif j == i - 1:
-            rho[i, j] = 0.5
-        else:
-            rho[i, j] = 1
-
-rho[-1, 0] = 1.5
-rho[0, -1] = 0.5
-
-"""Initialise state vector as states = [0.5,0,0,...]"""
-states = torch.Tensor(N,1)
-states[0] = 0.5
-states.requires_grad_(True)
-
-lr = 0.1 # Learning Rate
-for t in range(0, target.shape[1]):
-    states, pos = forward(states,rho,L)
-    loss = torch.sum((pos - target[:,t].float().view([2,1]))**2)
+    with amp.autocast(enabled=False):
+        y_pred = net(x)
+        loss = torch.sum(y_pred - pos_target) ** 2 
+        loss = scaler.scale(loss)
+    
+    print("Batch: ", i, " Loss: ", loss.item())
     loss.backward()
-    L.data -= L.grad.data * lr
-    print(f"Loss: {loss.item()}")
-    L.grad.data.zero_()
+    optimizer.step()
+
+
+
+

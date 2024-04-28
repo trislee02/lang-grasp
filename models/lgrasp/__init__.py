@@ -1,4 +1,5 @@
 from .models.lseg_net import LSegNet
+from .lgrasp_module import LGraspModule
 
 def make_model(args):
     net = LSegNet(
