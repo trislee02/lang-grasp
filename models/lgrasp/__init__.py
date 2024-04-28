@@ -34,8 +34,8 @@ def make_trainer(args):
         save_on_train_epoch_end=False,
     )
 
-    if not os.path.exists(args.checkpoint_callback):
-        os.makedirs(args.checkpoint_callback)
+    if not os.path.exists(args.checkpoint_dir):
+        os.makedirs(args.checkpoint_dir)
 
     trainer = pl.Trainer.from_argparse_args(args)
     return trainer
