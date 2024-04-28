@@ -306,12 +306,9 @@ def run():
     logging.info('Done')
 
     # Debugging
-    logging.info('Debugging...')
+    logging.info('Loading network...')
     net = make_model(args)
-    net.to(device)
-    
-    net = net.to(device)
-    logging.info('Done')
+    # net = net.to(device)
 
     if args.optim.lower() == 'adam':
         optimizer = optim.Adam(net.parameters())
