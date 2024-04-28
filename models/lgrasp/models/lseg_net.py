@@ -178,12 +178,12 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
     def forward(self, x_in, prompt=''):
         # Check if x is of type tuple, i.e. from a dataloader
         # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size` prompts
-        if isinstance(x_in, tuple):
-            x = x_in[0].detach().clone()
-            x.requires_grad = True
-            
-            prompt = list(x_in[1])
-
+        with torch.no_grad():
+            if isinstance(x_in, tuple):
+                x = x_in[0] #.detach().clone()
+                # x.requires_grad = True
+                prompt = list(x_in[1])
+                
         if prompt == '':
             text = self.text
         else:
