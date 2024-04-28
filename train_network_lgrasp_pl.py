@@ -161,6 +161,7 @@ def run():
     train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices)
     val_sampler = torch.utils.data.sampler.SubsetRandomSampler(val_indices)
 
+    logging.info("Training batch size: {}".format(args.batch_size))
     train_data = torch.utils.data.DataLoader(
         dataset,
         batch_size=args.batch_size,
