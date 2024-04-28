@@ -135,10 +135,16 @@ if __name__ == '__main__':
                 yc = [yi.to(device) for yi in y]
                 lossd = net.model.compute_loss(xc, yc)
 
+                didx = didx.item()
+                rot = rot.item()
+                zoom = zoom.item()
+
                 q_img, ang_img, width_img = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
                                                                 lossd['pred']['sin'], lossd['pred']['width'])
 
+
                 if args.iou_eval:
+                    
                     s = evaluation.calculate_iou_match(q_img, ang_img, test_data.dataset.get_gtbb(didx, rot, zoom),
                                                        no_grasps=args.n_grasps,
                                                        grasp_width=width_img,
