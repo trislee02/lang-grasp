@@ -26,7 +26,7 @@ class GraspModel(nn.Module):
         width_loss = F.smooth_l1_loss(width_pred, y_width)
 
         return {
-            'loss': p_loss, # + cos_loss + sin_loss + width_loss,
+            'loss': p_loss + cos_loss + sin_loss + width_loss,
             'losses': {
                 'p_loss': p_loss,
                 'cos_loss': cos_loss,
