@@ -2,7 +2,7 @@ from .models.lseg_net import LSegNet
 
 def make_model(args):
     net = LSegNet(
-            labels=[''],
+            labels='',
             backbone=args.backbone,
             features=args.num_features,
             crop_size=224,
