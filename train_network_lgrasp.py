@@ -202,7 +202,7 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
+            parameters_grad(net)
             # Display the images
             if vis:
                 imgs = []
