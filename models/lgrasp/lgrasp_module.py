@@ -57,6 +57,7 @@ class LGraspModule(pl.LightningModule):
     def validation_epoch_end(self, outs):
         # Log the accuracy metric
         self.log("val_accuracy", self.val_accuracy.results['correct'] / (self.val_accuracy.results['correct'] + self.val_accuracy.results['failed']))
+        print("Validation accuracy: ", self.val_accuracy.results['correct'] / (self.val_accuracy.results['correct'] + self.val_accuracy.results['failed']))
         self.val_accuracy.reset()
 
     def configure_optimizers(self):

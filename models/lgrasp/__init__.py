@@ -25,15 +25,15 @@ def make_trainer(args):
     args.benchmark = True
     args.sync_batchnorm = True
     args.max_epochs = args.epochs
-    args.default_root_dir = args.checkpoint_dir
+    # args.default_root_dir = args.checkpoint_dir
     args.checkpoint_callback = pl.callbacks.ModelCheckpoint(
         dirpath=args.checkpoint_dir,
         filename='model-{epoch:02d}-{val_loss:.2f}',
-        save_top_k=3,
-        monitor='val_loss',
-        mode='min',
+        monitor='val_accuracy',
+        mode='max',
+        save_on_train_epoch_end=False,
     )
-    
+
     if not os.path.exists(args.default_root_dir):
         os.makedirs(args.default_root_dir)
 
