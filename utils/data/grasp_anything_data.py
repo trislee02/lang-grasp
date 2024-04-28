@@ -57,6 +57,7 @@ class GraspAnythingDataset(GraspDatasetBase):
         gtbbs = grasp.GraspRectangles.load_from_grasp_anything_file(self.grasp_files[idx], scale=self.output_size / 416.0)
 
         c = self.output_size // 2
+        c = c.cpu()
         gtbbs.rotate(rot, (c, c))
         gtbbs.zoom(zoom, (c, c))
 

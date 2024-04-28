@@ -83,6 +83,8 @@ def parse_args():
                         help='Optmizer for the training. (adam or SGD)')
     parser.add_argument("--accumulate_grad_batches", type=int, default=1,
                         help="accumulate N batches for gradient computation")
+    parser.add_argument('--checkpoint-dir', type=str, default='checkpoints/',
+                        help='Path to save model checkpoints')
 
     # Logging etc.
     parser.add_argument('--description', type=str, default='',
