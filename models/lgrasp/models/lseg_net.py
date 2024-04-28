@@ -225,7 +225,7 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         
         # print(f"Logit scale shape: {self.logit_scale.shape}") # []
 
-        logits_per_image = self.logit_scale * image_features.half() @ text_features.mT
+        logits_per_image = self.logit_scale * image_features.half() @ text_features.t()
 
         # print(f"Logits per image shape: {logits_per_image.shape}") # [batch_size, H/2 * W/2, 1]
 
@@ -252,10 +252,15 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
-        cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
-        sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
-        width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
+        with torch.no_grad():
+            out_pos = self.scratch.output_conv_pos(out_pos)
+            out_cos = self.scratch.output_conv_cos(out_cos)
+            out_sin = self.scratch.output_conv_sin(out_sin)
+            out_width = self.scratch.output_conv_width(out_width)
+        # pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
+        # cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
+        # sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
+        # width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
 
         # pos_output.requires_grad_(True)
         # cos_output.requires_grad_(True)

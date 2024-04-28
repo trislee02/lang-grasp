@@ -199,7 +199,7 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
                 results['losses'][ln] += l.item()
 
             optimizer.zero_grad()
-            loss.backward(retain_graph=True)
+            loss.backward()
             optimizer.step()
 
             # Display the images
