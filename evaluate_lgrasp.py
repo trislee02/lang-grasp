@@ -42,7 +42,7 @@ def parse_args():
                         help='Shuffle the dataset')
     parser.add_argument('--ds-rotate', type=float, default=0.0,
                         help='Shift the start point of the dataset to use a different test/train split')
-    parser.add_argument('--num-workers', type=int, default=-1,
+    parser.add_argument('--num-workers', type=int, default=8,
                         help='Dataset workers')
 
     # Evaluation
