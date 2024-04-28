@@ -22,7 +22,7 @@ from utils.dataset_processing import evaluation
 from utils.visualisation.gridshow import gridshow
 from utils import count_parameters, parameters_grad
 
-from models.lgrasp import make_model
+from models.lgrasp import make_model, make_trainer
 from models.lgrasp import LGraspModule
 
 import pytorch_lightning as pl
@@ -327,8 +327,8 @@ def run():
     # Set up Pytorch Lightning Module
     model = LGraspModule(net, net.compute_loss, optimizer, None)
 
+    trainer = make_trainer(args)
     # Fit model using train and val dataloader
-    trainer = pl.Trainer(max_epochs=args.epochs)
     trainer.fit(model, train_data, val_data)
 
 
