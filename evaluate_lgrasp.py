@@ -11,6 +11,8 @@ from utils.data import get_dataset
 from utils.dataset_processing import evaluation, grasp
 from utils.visualisation.plot import save_results
 
+from models.lgrasp import LGraspModule
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -112,7 +114,10 @@ if __name__ == '__main__':
         logging.info('\nEvaluating model {}'.format(network))
 
         # Load Network
-        net = torch.load(network)
+        # net = torch.load(network)
+
+        net = LGraspModule.load_from_checkpoint(network)
+        net.eval()
 
         results = {'correct': 0, 'failed': 0}
 
@@ -127,7 +132,7 @@ if __name__ == '__main__':
             for idx, (x, y, didx, rot, zoom) in enumerate(test_data):
                 xc = x.to(device)
                 yc = [yi.to(device) for yi in y]
-                lossd = net.compute_loss(xc, yc)
+                lossd = net.model.compute_loss(xc, yc)
 
                 q_img, ang_img, width_img = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
                                                                 lossd['pred']['sin'], lossd['pred']['width'])
