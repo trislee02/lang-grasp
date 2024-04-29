@@ -100,6 +100,11 @@ def parse_args():
     parser.add_argument('--seen', type=int, default=1,
                         help='Flag for using seen classes, only work for Grasp-Anything dataset') 
 
+
+    # Resume training
+    parser.add_argument('--resume-checkpoint', type=str, default='',
+                        help='Path to model to resume training')
+
     args = parser.parse_args()
     return args
 
@@ -185,15 +190,18 @@ def run():
     net = make_model(args)
 
     # Set up Pytorch Lightning Module
-    model = LGraspModule(dataset=dataset,
-                         max_epochs=args.epochs,
-                         base_lr=4e-3,
-                         backbone=args.backbone,
-                         num_features=args.num_features,
-                         arch_option=args.arch_option,
-                         block_depth=args.block_depth,
-                         activation=args.activation,)
-
+    if args.resume_checkpoint == '':
+        model = LGraspModule(dataset=dataset,
+                             max_epochs=args.epochs,
+                             base_lr=4e-3,
+                             backbone=args.backbone,
+                             num_features=args.num_features,
+                             arch_option=args.arch_option,
+                             block_depth=args.block_depth,
+                             activation=args.activation,)
+    else:
+        model = LGraspModule.load_from_checkpoint(args.resume_checkpoint)
+        
     # Set up Pytorch Lightning Trainer
     trainer = make_trainer(args)
 

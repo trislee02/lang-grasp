@@ -29,6 +29,7 @@ class LGraspModule(pl.LightningModule):
         if dataset:
             self.dataset = dataset
             self.val_accuracy = GraspAccuracy(dataset=dataset)
+            self.train_accuracy = GraspAccuracy(dataset=dataset)
         
         self.epochs = max_epochs
         self.enabled = False #True mixed precision will make things complicated and leading to NAN error
@@ -47,11 +48,20 @@ class LGraspModule(pl.LightningModule):
             lossd = self.loss_fn(xc, yc)
             loss = lossd['loss']
         self.log("train_loss", loss)
+
+        # Update the accuracy metric
+        didx = didx.item()
+        rot = rot.item()
+        zoom_factor = zoom_factor.item()
+        self.train_accuracy.update(lossd, didx, rot, zoom_factor)
+
         return loss
 
     def training_epoch_end(self, outs):
-        # TODO: Add metric calculation
-        print("Epoch end", outs)
+        # Log the accuracy metric
+        self.log("val_accuracy", self.train_accuracy.accuracy()) 
+        print("\nTraining accuracy: ", self.train_accuracy.accuracy())
+        self.train_accuracy.reset()
 
     def validation_step(self, batch, batch_idx):
         x, y, didx, rot, zoom_factor = batch
@@ -72,7 +82,7 @@ class LGraspModule(pl.LightningModule):
     def validation_epoch_end(self, outs):
         # Log the accuracy metric
         self.log("val_accuracy", self.val_accuracy.accuracy()) 
-        print("Validation accuracy: ", self.val_accuracy.accuracy())
+        print("\nValidation accuracy: ", self.val_accuracy.accuracy())
         self.val_accuracy.reset()
 
     def configure_optimizers(self):
@@ -108,12 +118,11 @@ class LGraspModule(pl.LightningModule):
                 {"params": self.model.scale4_conv.parameters(), "lr": self.base_lr * 10}
             )
 
-        
-        opt = torch.optim.SGD(
-            params_list,
-            lr=self.base_lr,
-            momentum=0.9,
-            weight_decay=1e-4,
+        opt = torch.optim.Adam(
+                params_list,
+                lr=self.base_lr,
+                betas=(0.9, 0.999),
+                weight_decay=1e-4,
         )
         sch = torch.optim.lr_scheduler.LambdaLR(
             opt, lambda x: pow(1.0 - x / self.epochs, 0.9)
