@@ -1,0 +1,1 @@
+python train_network_lgrasp_pl.py --dataset grasp-anything --dataset-path data/grasp-anything --description training_grasp_anything --use-depth 0 --arch-option 2 --block-depth 2 --checkpoint-dir grasp_anything_ckpt --batch-size 2

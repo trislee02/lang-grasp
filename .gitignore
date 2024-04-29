@@ -113,3 +113,16 @@ saved_data/
 data/*
 logs/
 trained-models/grasp_det_seg
+
+# environment
+lgrasp/
+
+# checkpoints
+checkpoints/
+grasp_anything_ckpt/
+
+# results
+results/
+
+# lightning logs
+lightning_logs/

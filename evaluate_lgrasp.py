@@ -131,6 +131,7 @@ if __name__ == '__main__':
 
         with torch.no_grad():
             for idx, (x, y, didx, rot, zoom) in enumerate(test_data):
+                input("Press Enter to continue...")
                 logging.info('Processing {}/{}'.format(idx, len(test_data)))
                 xc = (x[0].to(device), x[1])
                 yc = [yi.to(device) for yi in y]
@@ -140,6 +141,7 @@ if __name__ == '__main__':
                 rot = rot.item()
                 zoom = zoom.item()
 
+                print(f"Loss: {lossd['loss']}")
                 q_img, ang_img, width_img = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
                                                                 lossd['pred']['sin'], lossd['pred']['width'])
 

@@ -1,0 +1,1 @@
+python evaluate_lgrasp.py --network grasp_anything_ckpt/model-epoch=05-val_loss=0.07.ckpt --dataset grasp-anything --dataset-path data/grasp-anything --iou-eval --vis

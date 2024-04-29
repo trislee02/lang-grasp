@@ -19,9 +19,9 @@ def make_model(args):
     return net
 
 def make_trainer(args):
-    args.gpus = -1
+    args.gpus = 1
     args.accelerator = "gpu"
-    args.strategy = "ddp"
+    # args.strategy = "ddp" # Disable if there is a single GPU or there is not built-in NCCL support
     args.benchmark = True
     args.sync_batchnorm = True
     args.max_epochs = args.epochs
