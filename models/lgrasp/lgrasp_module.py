@@ -60,7 +60,7 @@ class LGraspModule(pl.LightningModule):
 
     def training_epoch_end(self, outs):
         # Log the accuracy metric
-        self.log("val_accuracy", self.train_accuracy.accuracy()) 
+        self.log("train_accuracy", self.train_accuracy.accuracy()) 
         print("\nTraining accuracy: ", self.train_accuracy.accuracy())
         self.train_accuracy.reset()
 
