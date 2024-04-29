@@ -172,7 +172,8 @@ if __name__ == '__main__':
                         grasp_q_img=q_img,
                         grasp_angle_img=ang_img,
                         no_grasps=args.n_grasps,
-                        grasp_width_img=width_img
+                        grasp_width_img=width_img,
+                        description=x[1]
                     )
 
         avg_time = (time.time() - start_time) / len(test_data)
