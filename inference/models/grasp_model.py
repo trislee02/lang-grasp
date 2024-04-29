@@ -17,8 +17,8 @@ class GraspModel(nn.Module):
         # print(f"Input shape: {xc.shape}") # [1, 3, 224, 224]
         y_pos, y_cos, y_sin, y_width = yc
         pos_pred, cos_pred, sin_pred, width_pred = self(xc)
-        print(f"Prediction shape: {pos_pred.shape}, {cos_pred.shape}, {sin_pred.shape}, {width_pred.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
-        print(f"Ground truth shape: {y_pos.shape}, {y_cos.shape}, {y_sin.shape}, {y_width.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
+        # print(f"Prediction shape: {pos_pred.shape}, {cos_pred.shape}, {sin_pred.shape}, {width_pred.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
+        # print(f"Ground truth shape: {y_pos.shape}, {y_cos.shape}, {y_sin.shape}, {y_width.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
 
         p_loss = F.smooth_l1_loss(pos_pred, y_pos)
         cos_loss = F.smooth_l1_loss(cos_pred, y_cos)
