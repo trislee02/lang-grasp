@@ -200,6 +200,7 @@ def run():
                              block_depth=args.block_depth,
                              activation=args.activation,)
     else:
+        logging.info('Resuming training from checkpoint: {}'.format(args.resume_checkpoint))
         model = LGraspModule.load_from_checkpoint(args.resume_checkpoint)
         
     # Set up Pytorch Lightning Trainer
