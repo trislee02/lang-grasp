@@ -140,8 +140,11 @@ if __name__ == '__main__':
                 rot = rot.item()
                 zoom = zoom.item()
 
-                q_img, ang_img, width_img = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
-                                                                lossd['pred']['sin'], lossd['pred']['width'])
+                # q_img, ang_img, width_img = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
+                #                                                 lossd['pred']['sin'], lossd['pred']['width'])
+
+                y_pos, y_cos, y_sin, y_width = yc
+                q_img, ang_img, width_img = post_process_output(y_pos, y_cos, y_sin, y_width)
 
                 if args.iou_eval:                    
                     s = evaluation.calculate_iou_match(q_img, ang_img, test_data.dataset.get_gtbb(didx, rot, zoom),
