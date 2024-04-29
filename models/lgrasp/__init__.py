@@ -26,15 +26,15 @@ def make_trainer(args):
     args.sync_batchnorm = True
     args.max_epochs = args.epochs
     # args.default_root_dir = args.checkpoint_dir
-    acc_checkpoint = pl.callbacks.ModelCheckpoint(
-        dirpath=args.checkpoint_dir,
-        filename='model-{epoch:02d}-{val_accuracy:.2f}',
-        monitor='val_accuracy',
-        mode='max',
-        save_on_train_epoch_end=False,
-        verbose=True,
-        save_top_k=3,
-    )
+    # acc_checkpoint = pl.callbacks.ModelCheckpoint(
+    #     dirpath=args.checkpoint_dir,
+    #     filename='model-{epoch:02d}-{val_accuracy:.2f}',
+    #     monitor='val_accuracy',
+    #     mode='max',
+    #     save_on_train_epoch_end=False,
+    #     verbose=True,
+    #     save_top_k=3,
+    # )
 
     loss_checkpoint = pl.callbacks.ModelCheckpoint(
         dirpath=args.checkpoint_dir,

@@ -147,18 +147,18 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         self.scratch.head1 = nn.Conv2d(features, self.out_c, kernel_size=1)
 
         self.arch_option = kwargs["arch_option"]
-        if self.arch_option == 1:
-            self.scratch.head_block_pos = bottleneck_block(activation=kwargs["activation"])
-            self.scratch.head_block_cos = bottleneck_block(activation=kwargs["activation"])
-            self.scratch.head_block_sin = bottleneck_block(activation=kwargs["activation"])
-            self.scratch.head_block_width = bottleneck_block(activation=kwargs["activation"])
-            self.block_depth = kwargs['block_depth']
-        elif self.arch_option == 2:
-            self.scratch.head_block_pos = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_cos = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_sin = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_width = depthwise_block(activation=kwargs["activation"])
-            self.block_depth = kwargs['block_depth']
+        self.block_depth = kwargs['block_depth']
+        if self.block_depth > 0:
+            if self.arch_option == 1:
+                self.scratch.head_block_pos = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
+                self.scratch.head_block_cos = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
+                self.scratch.head_block_sin = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
+                self.scratch.head_block_width = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
+            elif self.arch_option == 2:
+                self.scratch.head_block_pos = [depthwise_block(activation=kwargs["activation"])] * self.block_depth
+                self.scratch.head_block_cos = [depthwise_block(activation=kwargs["activation"])] * self.block_depth
+                self.scratch.head_block_sin = [depthwise_block(activation=kwargs["activation"])] * self.block_depth
+                self.scratch.head_block_width = [depthwise_block(activation=kwargs["activation"])] * self.block_depth
 
         self.scratch.output_conv_pos = nn.Sequential(
             Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
@@ -236,17 +236,17 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        if self.arch_option in [1, 2]:
-            out_pos = self.scratch.head_block_pos(out)
-            out_cos = self.scratch.head_block_cos(out)
-            out_sin = self.scratch.head_block_sin(out)
-            out_width = self.scratch.head_block_width(out)
+        if self.block_depth > 0 and self.arch_option in [1, 2]:
+            out_pos = self.scratch.head_block_pos[0](out)
+            out_cos = self.scratch.head_block_cos[0](out)
+            out_sin = self.scratch.head_block_sin[0](out)
+            out_width = self.scratch.head_block_width[0](out)
 
-            for _ in range(self.block_depth - 1):
-                out_pos = self.scratch.head_block_pos(out_pos)
-                out_cos = self.scratch.head_block_cos(out_cos)
-                out_sin = self.scratch.head_block_sin(out_sin)
-                out_width = self.scratch.head_block_width(out_width)
+            for i in range(self.block_depth - 1):
+                out_pos = self.scratch.head_block_pos[i](out_pos)
+                out_cos = self.scratch.head_block_cos[i](out_cos)
+                out_sin = self.scratch.head_block_sin[i](out_sin)
+                out_width = self.scratch.head_block_width[i](out_width)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
