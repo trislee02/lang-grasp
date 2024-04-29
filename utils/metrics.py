@@ -9,6 +9,9 @@ class GraspAccuracy:
                 'failed': 0
             }
         self.dataset = dataset
+
+    def accuracy(self):
+        return self.results['correct'] / (self.results['correct'] + self.results['failed'])
         
     def update(self, lossd, didx, rot, zoom_factor):
         '''
