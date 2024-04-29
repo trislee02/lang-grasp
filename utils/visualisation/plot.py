@@ -116,7 +116,7 @@ def plot_grasp(
         fig.savefig('results/{}.png'.format(time))
 
 
-def save_results(rgb_img, grasp_q_img, grasp_angle_img, depth_img=None, no_grasps=1, grasp_width_img=None):
+def save_results(rgb_img, grasp_q_img, grasp_angle_img, depth_img=None, no_grasps=1, grasp_width_img=None, description=''):
     """
     Plot the output of a network
     :param rgb_img: RGB Image
@@ -127,6 +127,11 @@ def save_results(rgb_img, grasp_q_img, grasp_angle_img, depth_img=None, no_grasp
     :param grasp_width_img: (optional) Width output of network
     :return:
     """
+    if description == '':
+        description = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    filename = 'results/{}'.format(description)
+
     gs = detect_grasps(grasp_q_img, grasp_angle_img, width_img=grasp_width_img, no_grasps=no_grasps)
 
     fig = plt.figure(figsize=(10, 10))
@@ -136,7 +141,7 @@ def save_results(rgb_img, grasp_q_img, grasp_angle_img, depth_img=None, no_grasp
     ax.imshow(rgb_img)
     ax.set_title('RGB')
     ax.axis('off')
-    fig.savefig('results/rgb.png')
+    fig.savefig(filename + '-rgb.png')
 
     if depth_img and depth_img.any():
         fig = plt.figure(figsize=(10, 10))
@@ -148,7 +153,7 @@ def save_results(rgb_img, grasp_q_img, grasp_angle_img, depth_img=None, no_grasp
             g.plot(ax)
         ax.set_title('Depth')
         ax.axis('off')
-        fig.savefig('results/depth.png')
+        fig.savefig(filename + '-depth.png')
 
     fig = plt.figure(figsize=(10, 10))
     plt.ion()
@@ -159,7 +164,7 @@ def save_results(rgb_img, grasp_q_img, grasp_angle_img, depth_img=None, no_grasp
         g.plot(ax)
     ax.set_title('Grasp')
     ax.axis('off')
-    fig.savefig('results/grasp.png')
+    fig.savefig(filename + '-grasp.png')
 
     fig = plt.figure(figsize=(10, 10))
     plt.ion()
@@ -169,7 +174,7 @@ def save_results(rgb_img, grasp_q_img, grasp_angle_img, depth_img=None, no_grasp
     ax.set_title('Q')
     ax.axis('off')
     plt.colorbar(plot)
-    fig.savefig('results/quality.png')
+    fig.savefig(filename + '-quality.png')
 
     fig = plt.figure(figsize=(10, 10))
     plt.ion()
@@ -179,7 +184,7 @@ def save_results(rgb_img, grasp_q_img, grasp_angle_img, depth_img=None, no_grasp
     ax.set_title('Angle')
     ax.axis('off')
     plt.colorbar(plot)
-    fig.savefig('results/angle.png')
+    fig.savefig(filename + '-angle.png')
 
     fig = plt.figure(figsize=(10, 10))
     plt.ion()
@@ -189,7 +194,7 @@ def save_results(rgb_img, grasp_q_img, grasp_angle_img, depth_img=None, no_grasp
     ax.set_title('Width')
     ax.axis('off')
     plt.colorbar(plot)
-    fig.savefig('results/width.png')
+    fig.savefig(filename + '-width.png')
 
     fig.canvas.draw()
     plt.close(fig)
