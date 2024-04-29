@@ -150,15 +150,36 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
         self.block_depth = kwargs['block_depth']
         if self.block_depth > 0:
             if self.arch_option == 1:
-                self.scratch.head_block_pos = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
-                self.scratch.head_block_cos = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
-                self.scratch.head_block_sin = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
-                self.scratch.head_block_width = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
+                self.scratch.head_block_pos_1 = bottleneck_block(activation=kwargs["activation"])
+                self.scratch.head_block_cos_1 = bottleneck_block(activation=kwargs["activation"])
+                self.scratch.head_block_sin_1 = bottleneck_block(activation=kwargs["activation"])
+                self.scratch.head_block_width_1 = bottleneck_block(activation=kwargs["activation"])
+
+                self.scratch.head_block_pos_2 = bottleneck_block(activation=kwargs["activation"])
+                self.scratch.head_block_cos_2 = bottleneck_block(activation=kwargs["activation"])
+                self.scratch.head_block_sin_2 = bottleneck_block(activation=kwargs["activation"])
+                self.scratch.head_block_width_2 = bottleneck_block(activation=kwargs["activation"])
+
+                self.scratch.head_block_pos_3 = bottleneck_block(activation=kwargs["activation"])
+                self.scratch.head_block_cos_3 = bottleneck_block(activation=kwargs["activation"])
+                self.scratch.head_block_sin_3 = bottleneck_block(activation=kwargs["activation"])
+                self.scratch.head_block_width_3 = bottleneck_block(activation=kwargs["activation"])
+
             elif self.arch_option == 2:
-                self.scratch.head_block_pos = [depthwise_block(activation=kwargs["activation"]).cuda() for _ in range(self.block_depth)]
-                self.scratch.head_block_cos = [depthwise_block(activation=kwargs["activation"]).cuda() for _ in range(self.block_depth)]
-                self.scratch.head_block_sin = [depthwise_block(activation=kwargs["activation"]).cuda() for _ in range(self.block_depth)]
-                self.scratch.head_block_width = [depthwise_block(activation=kwargs["activation"]).cuda() for _ in range(self.block_depth)]
+                self.scratch.head_block_pos_1 = depthwise_block(activation=kwargs["activation"])
+                self.scratch.head_block_cos_1 = depthwise_block(activation=kwargs["activation"])
+                self.scratch.head_block_sin_1 = depthwise_block(activation=kwargs["activation"])
+                self.scratch.head_block_width_1 = depthwise_block(activation=kwargs["activation"])
+
+                self.scratch.head_block_pos_2 = depthwise_block(activation=kwargs["activation"])
+                self.scratch.head_block_cos_2 = depthwise_block(activation=kwargs["activation"])
+                self.scratch.head_block_sin_2 = depthwise_block(activation=kwargs["activation"])
+                self.scratch.head_block_width_2 = depthwise_block(activation=kwargs["activation"])
+
+                self.scratch.head_block_pos_3 = depthwise_block(activation=kwargs["activation"])
+                self.scratch.head_block_cos_3 = depthwise_block(activation=kwargs["activation"])
+                self.scratch.head_block_sin_3 = depthwise_block(activation=kwargs["activation"])
+                self.scratch.head_block_width_3 = depthwise_block(activation=kwargs["activation"])
 
         self.scratch.output_conv_pos = nn.Sequential(
             Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
@@ -236,17 +257,34 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        if self.block_depth > 0 and self.arch_option in [1, 2]:
-            out_pos = self.scratch.head_block_pos[0](out)
-            out_cos = self.scratch.head_block_cos[0](out)
-            out_sin = self.scratch.head_block_sin[0](out)
-            out_width = self.scratch.head_block_width[0](out)
+        # if self.block_depth > 0 and self.arch_option in [1, 2]:
+        #     out_pos = self.scratch.head_block_pos[0](out)
+        #     out_cos = self.scratch.head_block_cos[0](out)
+        #     out_sin = self.scratch.head_block_sin[0](out)
+        #     out_width = self.scratch.head_block_width[0](out)
 
-            for i in range(self.block_depth - 1):
-                out_pos = self.scratch.head_block_pos[i](out_pos)
-                out_cos = self.scratch.head_block_cos[i](out_cos)
-                out_sin = self.scratch.head_block_sin[i](out_sin)
-                out_width = self.scratch.head_block_width[i](out_width)
+        #     for i in range(self.block_depth - 1):
+        #         out_pos = self.scratch.head_block_pos[i](out_pos)
+        #         out_cos = self.scratch.head_block_cos[i](out_cos)
+        #         out_sin = self.scratch.head_block_sin[i](out_sin)
+        #         out_width = self.scratch.head_block_width[i](out_width)
+
+        out_pos = self.scratch.head_block_pos_1(out)
+        out_cos = self.scratch.head_block_cos_1(out)
+        out_sin = self.scratch.head_block_sin_1(out)
+        out_width = self.scratch.head_block_width_1(out)
+
+        if self.block_depth > 1:
+            out_pos = self.scratch.head_block_pos_2(out_pos)
+            out_cos = self.scratch.head_block_cos_2(out_cos)
+            out_sin = self.scratch.head_block_sin_2(out_sin)
+            out_width = self.scratch.head_block_width_2(out_width)
+
+        if self.block_depth > 2:
+            out_pos = self.scratch.head_block_pos_3(out_pos)
+            out_cos = self.scratch.head_block_cos_3(out_cos)
+            out_sin = self.scratch.head_block_sin_3(out_sin)
+            out_width = self.scratch.head_block_width_3(out_width)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
