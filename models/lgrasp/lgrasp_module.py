@@ -53,8 +53,8 @@ class LGraspModule(pl.LightningModule):
         didx_list = didx.tolist()
         rot_list = rot.tolist()
         zoom_factor_list = zoom_factor.tolist()
-        for didx, rot, zoom_factor in zip(didx_list, rot_list, zoom_factor_list):
-            self.train_accuracy.update(lossd, didx, rot, zoom_factor)
+        for i in range(len(didx_list)):
+            self.train_accuracy.update(lossd, didx_list[i], rot_list[i], zoom_factor_list[i])
 
         return loss
 
