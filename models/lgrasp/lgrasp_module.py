@@ -41,7 +41,7 @@ class LGraspModule(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch, batch_idx):
-        x, y, _, _, _ = batch
+        x, y, didx, rot, zoom_factor = batch
         xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
         yc = [yy for yy in y]
         with amp.autocast(enabled=self.enabled):
