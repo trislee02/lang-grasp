@@ -19,8 +19,15 @@ def post_process_output(q_img, cos_img, sin_img, width_img):
     ang_img = gaussian(ang_img, 2.0, preserve_range=True)
     width_img = gaussian(width_img, 1.0, preserve_range=True)
 
+    # Print out statistic of each img
     print(f"Mean of q_img: {q_img.mean()}")
     print(f"Mean of ang_img: {ang_img.mean()}")
     print(f"Mean of width_img: {width_img.mean()}")
-
+    print(f"Max of q_img: {q_img.max()}")
+    print(f"Max of ang_img: {ang_img.max()}")
+    print(f"Max of width_img: {width_img.max()}")
+    print(f"Min of q_img: {q_img.min()}")
+    print(f"Min of ang_img: {ang_img.min()}")
+    print(f"Min of width_img: {width_img.min()}")
+    
     return q_img, ang_img, width_img
