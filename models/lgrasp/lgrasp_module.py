@@ -50,19 +50,20 @@ class LGraspModule(pl.LightningModule):
         self.log("train_loss", loss)
 
         # Update the accuracy metric
-        didx_list = didx.tolist()
-        rot_list = rot.tolist()
-        zoom_factor_list = zoom_factor.tolist()
-        for i in range(len(didx_list)):
-            self.train_accuracy.update(lossd, didx_list[i], rot_list[i], zoom_factor_list[i])
+        # didx_list = didx.tolist()
+        # rot_list = rot.tolist()
+        # zoom_factor_list = zoom_factor.tolist()
+        # for i in range(len(didx_list)):
+        #     self.train_accuracy.update(lossd, didx_list[i], rot_list[i], zoom_factor_list[i])
 
         return loss
 
     def training_epoch_end(self, outs):
         # Log the accuracy metric
-        self.log("train_accuracy", self.train_accuracy.accuracy()) 
-        print("\nTraining accuracy: ", self.train_accuracy.accuracy())
-        self.train_accuracy.reset()
+        # self.log("train_accuracy", self.train_accuracy.accuracy()) 
+        # print("\nTraining accuracy: ", self.train_accuracy.accuracy())
+        # self.train_accuracy.reset()
+        pass
 
     def validation_step(self, batch, batch_idx):
         x, y, didx, rot, zoom_factor = batch
