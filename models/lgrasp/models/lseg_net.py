@@ -155,10 +155,10 @@ class LSeg(GraspModel): # Origin: LSeg(BaseModel)
                 self.scratch.head_block_sin = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
                 self.scratch.head_block_width = [bottleneck_block(activation=kwargs["activation"])] * self.block_depth
             elif self.arch_option == 2:
-                self.scratch.head_block_pos = [depthwise_block(activation=kwargs["activation"])] * self.block_depth
-                self.scratch.head_block_cos = [depthwise_block(activation=kwargs["activation"])] * self.block_depth
-                self.scratch.head_block_sin = [depthwise_block(activation=kwargs["activation"])] * self.block_depth
-                self.scratch.head_block_width = [depthwise_block(activation=kwargs["activation"])] * self.block_depth
+                self.scratch.head_block_pos = [depthwise_block(activation=kwargs["activation"]) for _ in range(self.block_depth)]
+                self.scratch.head_block_cos = [depthwise_block(activation=kwargs["activation"]) for _ in range(self.block_depth)]
+                self.scratch.head_block_sin = [depthwise_block(activation=kwargs["activation"]) for _ in range(self.block_depth)]
+                self.scratch.head_block_width = [depthwise_block(activation=kwargs["activation"]) for _ in range(self.block_depth)]
 
         self.scratch.output_conv_pos = nn.Sequential(
             Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
