@@ -50,10 +50,11 @@ class LGraspModule(pl.LightningModule):
         self.log("train_loss", loss)
 
         # Update the accuracy metric
-        didx = didx.item()
-        rot = rot.item()
-        zoom_factor = zoom_factor.item()
-        self.train_accuracy.update(lossd, didx, rot, zoom_factor)
+        didx_list = didx.tolist()
+        rot_list = rot.tolist()
+        zoom_factor_list = zoom_factor.tolist()
+        for didx, rot, zoom_factor in zip(didx_list, rot_list, zoom_factor_list):
+            self.train_accuracy.update(lossd, didx, rot, zoom_factor)
 
         return loss
 
