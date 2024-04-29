@@ -46,7 +46,7 @@ def make_trainer(args):
         save_top_k=3,
     )
 
-    args.callbacks = [acc_checkpoint, loss_checkpoint]
+    args.callbacks = [loss_checkpoint]
 
     if not os.path.exists(args.checkpoint_dir):
         os.makedirs(args.checkpoint_dir)
