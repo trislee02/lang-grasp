@@ -1,5 +1,6 @@
 import os
 import pytorch_lightning as pl
+from pytorch_lightning.loggers import TensorBoardLogger
 from .lgrasp_net import LGraspNet
 from .lgrasp_module import LGraspModule
 
@@ -25,6 +26,14 @@ def make_trainer(args):
     args.benchmark = True
     args.sync_batchnorm = True
     args.max_epochs = args.epochs
+
+    # args.gradient_clip_val=0.5
+
+    args.logger = TensorBoardLogger(args.log_dir, name=args.name)
+
+    # Check overfit on small set of data
+    args.overfit_batches=0.01
+    
     # args.default_root_dir = args.checkpoint_dir
     # acc_checkpoint = pl.callbacks.ModelCheckpoint(
     #     dirpath=args.checkpoint_dir,
@@ -49,7 +58,6 @@ def make_trainer(args):
     )
 
     args.callbacks = [loss_checkpoint]
-    args.overfit_batches=0.01
 
     if not os.path.exists(args.checkpoint_dir):
         os.makedirs(args.checkpoint_dir)

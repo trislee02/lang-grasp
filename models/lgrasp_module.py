@@ -44,6 +44,7 @@ class LGraspModule(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch, batch_idx):
+        tensorboard_logger = self.logger.experiment
         x, y, didx, rot, zoom_factor = batch
         xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
         yc = [yy for yy in y]
@@ -51,7 +52,7 @@ class LGraspModule(pl.LightningModule):
             lossd = self.loss_fn(xc, yc)
             loss = lossd['loss']
         self.log("train_loss", loss)
-
+        tensorboard_logger.log_metrics({"train_loss": loss.item()})
         return loss
 
     def training_epoch_end(self, outs):
@@ -61,7 +62,7 @@ class LGraspModule(pl.LightningModule):
         # Compute the 2-norm for each layer
         # If using mixed precision, the gradients are already unscaled here
         norms = grad_norm(self.model, norm_type=2)
-        print("Gradient norms: ", norms)
+        # print("Gradient norms: ", norms)
         self.log_dict(norms)
 
     def validation_step(self, batch, batch_idx):
@@ -88,12 +89,17 @@ class LGraspModule(pl.LightningModule):
 
     def configure_optimizers(self):
         params_list = [
-            {"params": self.model.pretrained.parameters(), "lr": self.base_lr},
+            # {"params": self.model.pretrained.parameters(), "lr": self.base_lr},
         ]
         if hasattr(self.model, "scratch"):
             print("Found output scratch")
             params_list.append(
                 {"params": self.model.scratch.parameters(), "lr": self.base_lr * 10}
+            )
+        if hasattr(self.model, "grcnn"):
+            print("Found grcnn")
+            params_list.append(
+                {"params": self.model.grcnn.parameters(), "lr": self.base_lr}
             )
         if hasattr(self.model, "auxlayer"):
             print("Found auxlayer")
