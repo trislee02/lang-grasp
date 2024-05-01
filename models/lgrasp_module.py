@@ -52,7 +52,7 @@ class LGraspModule(pl.LightningModule):
             lossd = self.loss_fn(xc, yc)
             loss = lossd['loss']
         self.log("train_loss", loss)
-        tensorboard_logger.add_scalar({"train_loss": loss.item()})
+        tensorboard_logger.add_scalar(loss.item())
         return loss
 
     def training_epoch_end(self, outs):
