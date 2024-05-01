@@ -29,7 +29,7 @@ def make_trainer(args):
 
     # args.gradient_clip_val=0.5
 
-    args.logger = TensorBoardLogger(args.log_dir, name=args.name)
+    args.logger = TensorBoardLogger(args.logdir, name=args.description)
 
     # Check overfit on small set of data
     args.overfit_batches=0.01
