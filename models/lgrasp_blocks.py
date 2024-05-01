@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from inference.models.grasp_model import GraspModel, ResidualBlock
 
 from .lgrasp_vit import (
     _make_pretrained_clip_vitl16_384,
@@ -56,6 +57,37 @@ def _make_encoder(
 
     return clip_pretrained, pretrained, scratch
 
+def _make_grcnn(input_channels=1, output_channels=1, channel_size=32): 
+    grcnn = nn.Module()
+    grcnn.conv1 = nn.Conv2d(input_channels, channel_size, kernel_size=9, stride=1, padding=4)
+    grcnn.bn1 = nn.BatchNorm2d(channel_size)
+
+    grcnn.conv2 = nn.Conv2d(channel_size, channel_size * 2, kernel_size=4, stride=2, padding=1)
+    grcnn.bn2 = nn.BatchNorm2d(channel_size * 2)
+
+    grcnn.conv3 = nn.Conv2d(channel_size * 2, channel_size * 4, kernel_size=4, stride=2, padding=1)
+    grcnn.bn3 = nn.BatchNorm2d(channel_size * 4)
+
+    grcnn.res1 = ResidualBlock(channel_size * 4, channel_size * 4)
+    grcnn.res2 = ResidualBlock(channel_size * 4, channel_size * 4)
+    grcnn.res3 = ResidualBlock(channel_size * 4, channel_size * 4)
+    grcnn.res4 = ResidualBlock(channel_size * 4, channel_size * 4)
+    grcnn.res5 = ResidualBlock(channel_size * 4, channel_size * 4)
+
+    grcnn.conv4 = nn.ConvTranspose2d(channel_size * 4, channel_size * 2, kernel_size=4, stride=2, padding=1,
+                                    output_padding=1)
+    grcnn.bn4 = nn.BatchNorm2d(channel_size * 2)
+
+    grcnn.conv5 = nn.ConvTranspose2d(channel_size * 2, channel_size, kernel_size=4, stride=2, padding=2,
+                                    output_padding=1)
+    grcnn.bn5 = nn.BatchNorm2d(channel_size)
+
+    grcnn.conv6 = nn.ConvTranspose2d(channel_size, channel_size, kernel_size=9, stride=1, padding=4)
+
+    grcnn.pos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
+    grcnn.cos_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
+    grcnn.sin_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
+    grcnn.width_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
 
 def _make_scratch(in_shape, out_shape, groups=1, expand=False):
     scratch = nn.Module()

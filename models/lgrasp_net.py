@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .lgrasp_blocks import FeatureFusionBlock, Interpolate, _make_encoder, FeatureFusionBlock_custom, forward_vit
+from .lgrasp_blocks import FeatureFusionBlock, Interpolate, _make_encoder, FeatureFusionBlock_custom, forward_vit, _make_grcnn
 import clip
 import numpy as np
 import pandas as pd
@@ -168,6 +168,9 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
                 self.scratch.head_block_sin_3 = depthwise_block(activation=kwargs["activation"])
                 self.scratch.head_block_width_3 = depthwise_block(activation=kwargs["activation"])
 
+        self.grcnn = _make_grcnn()
+
+
         self.scratch.output_conv_pos = nn.Sequential(
             Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
         )
@@ -252,29 +255,44 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         #         out_sin = self.scratch.head_block_sin[i](out_sin)
         #         out_width = self.scratch.head_block_width[i](out_width)
 
-        out_pos = self.scratch.head_block_pos_1(out)
-        out_cos = self.scratch.head_block_cos_1(out)
-        out_sin = self.scratch.head_block_sin_1(out)
-        out_width = self.scratch.head_block_width_1(out)
+        # out_pos = self.scratch.head_block_pos_1(out)
+        # out_cos = self.scratch.head_block_cos_1(out)
+        # out_sin = self.scratch.head_block_sin_1(out)
+        # out_width = self.scratch.head_block_width_1(out)
 
-        if self.block_depth > 1:
-            out_pos = self.scratch.head_block_pos_2(out_pos)
-            out_cos = self.scratch.head_block_cos_2(out_cos)
-            out_sin = self.scratch.head_block_sin_2(out_sin)
-            out_width = self.scratch.head_block_width_2(out_width)
+        # if self.block_depth > 1:
+        #     out_pos = self.scratch.head_block_pos_2(out_pos)
+        #     out_cos = self.scratch.head_block_cos_2(out_cos)
+        #     out_sin = self.scratch.head_block_sin_2(out_sin)
+        #     out_width = self.scratch.head_block_width_2(out_width)
 
-        if self.block_depth > 2:
-            out_pos = self.scratch.head_block_pos_3(out_pos)
-            out_cos = self.scratch.head_block_cos_3(out_cos)
-            out_sin = self.scratch.head_block_sin_3(out_sin)
-            out_width = self.scratch.head_block_width_3(out_width)
+        # if self.block_depth > 2:
+        #     out_pos = self.scratch.head_block_pos_3(out_pos)
+        #     out_cos = self.scratch.head_block_cos_3(out_cos)
+        #     out_sin = self.scratch.head_block_sin_3(out_sin)
+        #     out_width = self.scratch.head_block_width_3(out_width)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
-        cos_output = self.scratch.output_conv_cos(out_cos) # [batch_size, 1, H, W]
-        sin_output = self.scratch.output_conv_sin(out_sin) # [batch_size, 1, H, W]
-        width_output = self.scratch.output_conv_width(out_width) # [batch_size, 1, H, W]
+        # Bilinear interpolation
+        out = self.scratch.output_conv_pos(out) # [batch_size, 1, H, W]
+
+        out = F.relu(self.bn1(self.conv1(out)))
+        out = F.relu(self.bn2(self.conv2(out)))
+        out = F.relu(self.bn3(self.conv3(out)))
+        out = self.res1(out)
+        out = self.res2(out)
+        out = self.res3(out)
+        out = self.res4(out)
+        out = self.res5(out)
+        out = F.relu(self.bn4(self.conv4(out)))
+        out = F.relu(self.bn5(self.conv5(out)))
+        out = self.conv6(out)
+
+        pos_output = self.pos_output(out)
+        cos_output = self.cos_output(out)
+        sin_output = self.sin_output(out)
+        width_output = self.width_output(out)
 
         return pos_output, cos_output, sin_output, width_output
 

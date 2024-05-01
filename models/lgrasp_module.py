@@ -27,7 +27,7 @@ class LGraspModule(pl.LightningModule):
         self.loss_fn = self.model.compute_loss
         self.base_lr = base_lr
         self.weight_decay = weight_decay
-        
+
         if dataset:
             self.dataset = dataset
             self.val_accuracy = GraspAccuracy(dataset=dataset)
@@ -80,7 +80,7 @@ class LGraspModule(pl.LightningModule):
 
     def configure_optimizers(self):
         params_list = [
-            {"params": self.model.pretrained.parameters(), "lr": self.base_lr},
+            # {"params": self.model.pretrained.parameters(), "lr": self.base_lr},
         ]
         if hasattr(self.model, "scratch"):
             print("Found output scratch")
