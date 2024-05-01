@@ -117,7 +117,7 @@ class LGraspModule(pl.LightningModule):
                 weight_decay=self.weight_decay,
         )
         sch = torch.optim.lr_scheduler.LambdaLR(
-            opt, lambda x: pow(1.0 - x / self.epochs, 0.9)
+            opt, lambda x: pow(1.0 - x / self.epochs, 0.9), verbose=True
         )
 
         return [opt], [sch]
