@@ -39,11 +39,11 @@ def make_trainer(args):
     loss_checkpoint = pl.callbacks.ModelCheckpoint(
         dirpath=args.checkpoint_dir,
         filename='model-{epoch:02d}-{val_loss:.2f}',
-        monitor='val_loss',
+        monitor='train_loss',
         mode='min',
         save_on_train_epoch_end=False,
         verbose=True,
-        save_top_k=3,
+        save_top_k=1,
     )
 
     args.callbacks = [loss_checkpoint]

@@ -27,7 +27,7 @@ class GraspModel(nn.Module):
         cos_loss = F.smooth_l1_loss(cos_pred, y_cos, reduction='sum') / batch_size
         sin_loss = F.smooth_l1_loss(sin_pred, y_sin, reduction='sum') / batch_size
         width_loss = F.smooth_l1_loss(width_pred, y_width, reduction='sum') / batch_size
-
+        
         return {
             'loss': p_loss + cos_loss + sin_loss + width_loss,
             'losses': {
