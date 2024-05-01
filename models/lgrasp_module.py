@@ -61,7 +61,8 @@ class LGraspModule(pl.LightningModule):
         # If using mixed precision, the gradients are already unscaled here
         norms = grad_norm(self.model.grcnn, norm_type=2)
         # print("Gradient norms: ", norms)
-        self.log(norms)
+        wandb_logger = self.logger.experiment
+        wandb_logger.log(norms)
 
     def validation_step(self, batch, batch_idx):
         x, y, didx, rot, zoom_factor = batch
