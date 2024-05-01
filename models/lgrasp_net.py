@@ -241,7 +241,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
 
-        print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
+        # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
         # if self.block_depth > 0 and self.arch_option in [1, 2]:
         #     out_pos = self.scratch.head_block_pos[0](out)
@@ -276,7 +276,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # Bilinear interpolation
         out = self.scratch.output_conv_pos(out) # [batch_size, 1, H, W]
-        print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
+        # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
 
         out = F.relu(self.grcnn.bn1(self.grcnn.conv1(out)))
         out = F.relu(self.grcnn.bn2(self.grcnn.conv2(out)))
