@@ -3,7 +3,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from .lgrasp_net import LGraspNet
 from .lgrasp_module import LGraspModule
-
+import wandb
 
 
 def make_model(args):
@@ -29,8 +29,9 @@ def make_trainer(args):
 
     args.gradient_clip_val=0.5
 
-    args.logger = TensorBoardLogger(args.logdir, name=args.description)
-
+    wandb.login()
+    args.logger = pl.loggers.WandbLogger(project='lgrasp', name=args.description)
+    
     # Check overfit on small set of data
     args.overfit_batches=0.01
     
