@@ -1,6 +1,6 @@
 import os
 import pytorch_lightning as pl
-from .models.lgrasp_net import LGraspNet
+from .lgrasp_net import LGraspNet
 from .lgrasp_module import LGraspModule
 
 
