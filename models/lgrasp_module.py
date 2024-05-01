@@ -61,8 +61,8 @@ class LGraspModule(pl.LightningModule):
     def on_before_optimizer_step(self, optimizer, optimizer_idx):
         # Compute the 2-norm for each layer
         # If using mixed precision, the gradients are already unscaled here
-        norms = grad_norm(self.model, norm_type=2)
-        # print("Gradient norms: ", norms)
+        norms = grad_norm(self.model.grcnn, norm_type=2)
+        print("Gradient norms: ", norms)
         self.log_dict(norms)
 
     def validation_step(self, batch, batch_idx):
