@@ -27,7 +27,7 @@ def make_trainer(args):
     args.sync_batchnorm = True
     args.max_epochs = args.epochs
 
-    # args.gradient_clip_val=0.5
+    args.gradient_clip_val=0.5
 
     args.logger = TensorBoardLogger(args.logdir, name=args.description)
 
