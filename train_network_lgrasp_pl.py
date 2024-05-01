@@ -89,6 +89,8 @@ def parse_args():
                         help="accumulate N batches for gradient computation")
     parser.add_argument('--checkpoint-dir', type=str, default='checkpoints/',
                         help='Path to save model checkpoints')
+    parser.add_argument('--overfit-check', action='store_true', default=False,
+                        help='Overfit the network on a single batch')
 
     # Logging etc.
     parser.add_argument('--description', type=str, default='',

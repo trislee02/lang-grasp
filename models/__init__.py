@@ -30,10 +30,12 @@ def make_trainer(args):
     args.gradient_clip_val=0.5
 
     wandb.login()
-    args.logger = pl.loggers.WandbLogger(project='lgrasp', name=args.description)
-    
+
+    args.logger = pl.loggers.WandbLogger(project='lgrasp')
+
     # Check overfit on small set of data
-    args.overfit_batches=0.01
+    if args.overfit_check:
+        args.overfit_batches=0.01
     
     # args.default_root_dir = args.checkpoint_dir
     # acc_checkpoint = pl.callbacks.ModelCheckpoint(

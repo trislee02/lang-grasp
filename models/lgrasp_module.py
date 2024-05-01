@@ -44,7 +44,6 @@ class LGraspModule(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch, batch_idx):
-        wandb_logger = self.logger.experiment
         x, y, didx, rot, zoom_factor = batch
         xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
         yc = [yy for yy in y]
@@ -52,7 +51,6 @@ class LGraspModule(pl.LightningModule):
             lossd = self.loss_fn(xc, yc)
             loss = lossd['loss']
         self.log("train_loss", loss)
-        wandb_logger.log({'train_loss': loss})
         return loss
 
     def training_epoch_end(self, outs):
