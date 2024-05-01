@@ -49,6 +49,7 @@ def make_trainer(args):
     )
 
     args.callbacks = [loss_checkpoint]
+    args.overfit_batches=0.01
 
     if not os.path.exists(args.checkpoint_dir):
         os.makedirs(args.checkpoint_dir)
