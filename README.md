@@ -30,18 +30,13 @@ $ pip install torch-encoding
 
 
 ## Datasets
-- For datasets, please obtain following their instructions: [Cornell](https://www.kaggle.com/datasets/oneoneliu/cornell-grasp), [Jacquard](https://jacquard.liris.cnrs.fr/), [OCID-grasp](https://github.com/stefan-ainetter/grasp_det_seg_cnn), and [VMRD](https://gr.xjtu.edu.cn/zh/web/zeuslan/dataset).
 - For Grasp-Anything++, use the name `grasp-anything` because they share the same folder structure.
-- All datasets should be include in the following hierarchy:
+- The dataset should be include in the following hierarchy:
 ```
 |- data/
-    |- cornell
     |- grasp-anything
         |- seen
         |- unseen
-    |- jacquard
-    |- OCID_grasp
-    |- VMRD
 ```
 
 ## Training
