@@ -77,6 +77,8 @@ def parse_args():
                         help='Batch size')
     parser.add_argument('--base-lr', type=float, default=4e-3,
                         help='Base learning rate')
+    parser.add_argument('--weight-decay', type=float, default=1e-4,
+                        help='Weight decay')
     parser.add_argument('--epochs', type=int, default=200,
                         help='Training epochs')
     parser.add_argument('--batches-per-epoch', type=int, default=1000,
@@ -196,6 +198,7 @@ def run():
         model = LGraspModule(dataset=dataset,
                              max_epochs=args.epochs,
                              base_lr=args.base_lr,
+                             weight_decay=args.weight_decay,
                              backbone=args.backbone,
                              num_features=args.num_features,
                              arch_option=args.arch_option,

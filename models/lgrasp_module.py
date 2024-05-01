@@ -9,6 +9,7 @@ class LGraspModule(pl.LightningModule):
                  dataset=None,
                  max_epochs=100, 
                  base_lr=4e-3,
+                 weight_decay=1e-4,
                  backbone='clip_vitl16_384',
                  num_features=256,
                  arch_option=0,
@@ -25,6 +26,8 @@ class LGraspModule(pl.LightningModule):
         )
         self.loss_fn = self.model.compute_loss
         self.base_lr = base_lr
+        self.weight_decay = weight_decay
+        
         if dataset:
             self.dataset = dataset
             self.val_accuracy = GraspAccuracy(dataset=dataset)
@@ -111,8 +114,7 @@ class LGraspModule(pl.LightningModule):
         opt = torch.optim.Adam(
                 params_list,
                 lr=self.base_lr,
-                betas=(0.9, 0.999),
-                weight_decay=1e-4,
+                weight_decay=self.weight_decay,
         )
         sch = torch.optim.lr_scheduler.LambdaLR(
             opt, lambda x: pow(1.0 - x / self.epochs, 0.9)
