@@ -27,6 +27,7 @@ def make_trainer(args):
     args.sync_batchnorm = True
     args.max_epochs = args.epochs
 
+    # Clip the gradient
     args.gradient_clip_val=0.5
 
     wandb.login()
@@ -37,7 +38,6 @@ def make_trainer(args):
     if args.overfit_check:
         args.overfit_batches=0.01
     
-    # args.default_root_dir = args.checkpoint_dir
     # acc_checkpoint = pl.callbacks.ModelCheckpoint(
     #     dirpath=args.checkpoint_dir,
     #     filename='model-{epoch:02d}-{val_accuracy:.2f}',
