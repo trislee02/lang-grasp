@@ -1,7 +1,28 @@
-import pytorch_lightning as pl
+# An example of using SmoothL1Loss of Pytorch
 
-from models.lgrasp import LGraspModule
+import torch
+import torch.nn as nn
 
-model = LGraspModule.load_from_checkpoint("checkpoints/model-epoch=01-val_loss=0.64.ckpt")
-print(model)
-model.eval()
+# Define the input and target
+input = torch.randn(2, 3, requires_grad=True)
+target = torch.randn(2, 3)
+
+# Define the loss function
+loss = nn.SmoothL1Loss(reduction='sum')
+
+# Compute the loss
+output = loss(input, target)
+output.backward()
+
+# Print the output
+print(input)
+print("====================================")
+print(target)
+print("====================================")
+print((input - target).abs())
+print("====================================")
+print((input - target)**2)
+print("====================================")
+print(output)
+print(input.grad)
+

@@ -21,10 +21,12 @@ class GraspModel(nn.Module):
         # print(f"Prediction shape: {pos_pred.shape}, {cos_pred.shape}, {sin_pred.shape}, {width_pred.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
         # print(f"Ground truth shape: {y_pos.shape}, {y_cos.shape}, {y_sin.shape}, {y_width.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
 
-        p_loss = F.smooth_l1_loss(pos_pred, y_pos)
-        cos_loss = F.smooth_l1_loss(cos_pred, y_cos)
-        sin_loss = F.smooth_l1_loss(sin_pred, y_sin)
-        width_loss = F.smooth_l1_loss(width_pred, y_width)
+        batch_size = y_pos.shape[0]
+
+        p_loss = F.smooth_l1_loss(pos_pred, y_pos, reduction='sum') / batch_size
+        cos_loss = F.smooth_l1_loss(cos_pred, y_cos, reduction='sum') / batch_size
+        sin_loss = F.smooth_l1_loss(sin_pred, y_sin, reduction='sum') / batch_size
+        width_loss = F.smooth_l1_loss(width_pred, y_width, reduction='sum') / batch_size
 
         return {
             'loss': p_loss + cos_loss + sin_loss + width_loss,

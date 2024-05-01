@@ -142,12 +142,18 @@ if __name__ == '__main__':
                 zoom = zoom.item()
 
                 print(f"Loss: {lossd['loss']}")
-                q_img, ang_img, width_img = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
-                                                                lossd['pred']['sin'], lossd['pred']['width'])
-
                 # Ground truth
-                # y_pos, y_cos, y_sin, y_width = yc
-                # q_img, ang_img, width_img = post_process_output(y_pos, y_cos, y_sin, y_width)
+                y_pos, y_cos, y_sin, y_width = yc
+
+                y_pos = y_pos - lossd['pred']['pos']
+                y_cos = y_cos - lossd['pred']['cos']
+                y_sin = y_sin - lossd['pred']['sin']
+                y_width = y_width - lossd['pred']['width']
+
+                # q_img, ang_img, width_img = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
+                #                                                 lossd['pred']['sin'], lossd['pred']['width'])
+
+                q_img, ang_img, width_img = post_process_output(y_pos, y_cos, y_sin, y_width)
 
                 if args.iou_eval:                    
                     s = evaluation.calculate_iou_match(q_img, ang_img, test_data.dataset.get_gtbb(didx, rot, zoom),
