@@ -195,7 +195,7 @@ def run():
     if args.resume_checkpoint == '':
         model = LGraspModule(dataset=dataset,
                              max_epochs=args.epochs,
-                             base_lr=4e-3,
+                             base_lr=args.base_lr,
                              backbone=args.backbone,
                              num_features=args.num_features,
                              arch_option=args.arch_option,
