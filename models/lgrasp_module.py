@@ -52,7 +52,7 @@ class LGraspModule(pl.LightningModule):
             lossd = self.loss_fn(xc, yc)
             loss = lossd['loss']
         self.log("train_loss", loss)
-        wandb_logger.log('train_loss', loss)
+        wandb_logger.log({'train_loss': loss})
         return loss
 
     def training_epoch_end(self, outs):
