@@ -44,6 +44,7 @@ def make_trainer(args):
         save_on_train_epoch_end=False,
         verbose=True,
         save_top_k=1,
+        save_last=True,
     )
 
     args.callbacks = [loss_checkpoint]
