@@ -1,12 +1,12 @@
 import os
 import pytorch_lightning as pl
-from .models.lseg_net import LSegNet
+from .models.lgrasp_net import LGraspNet
 from .lgrasp_module import LGraspModule
 
 
 
 def make_model(args):
-    net = LSegNet(
+    net = LGraspNet(
             labels=[''],
             backbone=args.backbone,
             features=args.num_features,

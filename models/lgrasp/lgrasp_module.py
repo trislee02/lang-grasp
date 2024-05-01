@@ -2,7 +2,7 @@ import torch
 import torch.cuda.amp as amp
 import pytorch_lightning as pl
 from utils.metrics import GraspAccuracy
-from .models.lseg_net import LSegNet
+from .models.lgrasp_net import LGraspNet
 
 class LGraspModule(pl.LightningModule):
     def __init__(self, 
@@ -15,8 +15,7 @@ class LGraspModule(pl.LightningModule):
                  block_depth=0,
                  activation='lrelu',):
         super().__init__()
-        self.model = LSegNet(
-            labels=[''],
+        self.model = LGraspNet(
             backbone=backbone,
             features=num_features,
             crop_size=224,
@@ -49,20 +48,9 @@ class LGraspModule(pl.LightningModule):
             loss = lossd['loss']
         self.log("train_loss", loss)
 
-        # Update the accuracy metric
-        # didx_list = didx.tolist()
-        # rot_list = rot.tolist()
-        # zoom_factor_list = zoom_factor.tolist()
-        # for i in range(len(didx_list)):
-        #     self.train_accuracy.update(lossd, didx_list[i], rot_list[i], zoom_factor_list[i])
-
         return loss
 
     def training_epoch_end(self, outs):
-        # Log the accuracy metric
-        # self.log("train_accuracy", self.train_accuracy.accuracy()) 
-        # print("\nTraining accuracy: ", self.train_accuracy.accuracy())
-        # self.train_accuracy.reset()
         pass
 
     def validation_step(self, batch, batch_idx):
