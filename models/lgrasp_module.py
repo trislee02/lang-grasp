@@ -3,6 +3,7 @@ import torch.cuda.amp as amp
 import pytorch_lightning as pl
 from utils.metrics import GraspAccuracy
 from .lgrasp_net import LGraspNet
+from pytorch_lightning.utilities import grad_norm
 
 class LGraspModule(pl.LightningModule):
     def __init__(self, 
@@ -55,6 +56,13 @@ class LGraspModule(pl.LightningModule):
 
     def training_epoch_end(self, outs):
         pass
+
+    def on_before_optimizer_step(self, optimizer):
+        # Compute the 2-norm for each layer
+        # If using mixed precision, the gradients are already unscaled here
+        norms = grad_norm(self.layer, norm_type=2)
+        print("Gradient norms: ", norms)
+        self.log_dict(norms)
 
     def validation_step(self, batch, batch_idx):
         x, y, didx, rot, zoom_factor = batch
