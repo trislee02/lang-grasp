@@ -277,22 +277,22 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         # Bilinear interpolation
         out = self.scratch.output_conv_pos(out) # [batch_size, 1, H, W]
 
-        out = F.relu(self.bn1(self.conv1(out)))
-        out = F.relu(self.bn2(self.conv2(out)))
-        out = F.relu(self.bn3(self.conv3(out)))
-        out = self.res1(out)
-        out = self.res2(out)
-        out = self.res3(out)
-        out = self.res4(out)
-        out = self.res5(out)
-        out = F.relu(self.bn4(self.conv4(out)))
-        out = F.relu(self.bn5(self.conv5(out)))
-        out = self.conv6(out)
+        out = F.relu(self.grcnn.bn1(self.grcnn.conv1(out)))
+        out = F.relu(self.grcnn.bn2(self.grcnn.conv2(out)))
+        out = F.relu(self.grcnn.bn3(self.grcnn.conv3(out)))
+        out = self.grcnn.res1(out)
+        out = self.grcnn.res2(out)
+        out = self.grcnn.res3(out)
+        out = self.grcnn.res4(out)
+        out = self.grcnn.res5(out)
+        out = F.relu(self.grcnn.bn4(self.grcnn.conv4(out)))
+        out = F.relu(self.grcnn.bn5(self.grcnn.conv5(out)))
+        out = self.grcnn.conv6(out)
 
-        pos_output = self.pos_output(out)
-        cos_output = self.cos_output(out)
-        sin_output = self.sin_output(out)
-        width_output = self.width_output(out)
+        pos_output = self.grcnn.pos_output(out)
+        cos_output = self.grcnn.cos_output(out)
+        sin_output = self.grcnn.sin_output(out)
+        width_output = self.grcnn.width_output(out)
 
         return pos_output, cos_output, sin_output, width_output
 

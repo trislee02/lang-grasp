@@ -89,6 +89,8 @@ def _make_grcnn(input_channels=1, output_channels=1, channel_size=32):
     grcnn.sin_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
     grcnn.width_output = nn.Conv2d(in_channels=channel_size, out_channels=output_channels, kernel_size=2)
 
+    return grcnn
+
 def _make_scratch(in_shape, out_shape, groups=1, expand=False):
     scratch = nn.Module()
 
