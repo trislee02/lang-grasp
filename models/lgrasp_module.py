@@ -80,7 +80,7 @@ class LGraspModule(pl.LightningModule):
 
     def configure_optimizers(self):
         params_list = [
-            # {"params": self.model.pretrained.parameters(), "lr": self.base_lr},
+            {"params": self.model.pretrained.parameters(), "lr": self.base_lr},
         ]
         if hasattr(self.model, "scratch"):
             print("Found output scratch")
