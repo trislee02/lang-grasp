@@ -2,7 +2,7 @@ import torch
 import torch.cuda.amp as amp
 import pytorch_lightning as pl
 from utils.metrics import GraspAccuracy
-from .models.lgrasp_net import LGraspNet
+from .lgrasp_net import LGraspNet
 
 class LGraspModule(pl.LightningModule):
     def __init__(self, 

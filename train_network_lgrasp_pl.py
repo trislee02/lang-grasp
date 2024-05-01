@@ -22,8 +22,8 @@ from utils.dataset_processing import evaluation
 from utils.visualisation.gridshow import gridshow
 from utils import count_parameters, parameters_grad
 
-from models.lgrasp import make_model, make_trainer
-from models.lgrasp import LGraspModule
+from models import make_model, make_trainer
+from models import LGraspModule
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train network')
