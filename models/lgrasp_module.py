@@ -47,17 +47,9 @@ class LGraspModule(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch, batch_idx):
-        x, y, didx, rot, zoom_factor = batch
-        wandb_logger = self.logger.experiment
-        wandb_logger.log({"image": [wandb.Image(x[0][0], caption=x[1][0])]})
-        
+        x, y, didx, rot, zoom_factor = batch        
         xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
         yc = [yy for yy in y]
-        
-        y_pos, y_cos, y_sin, y_width = yc[0][0].detach().clone(), yc[0][1].detach().clone(), yc[0][2].detach().clone(), yc[0][3].detach().clone()
-
-        q_img, ang_img, width_img = post_process_output(y_pos, y_cos, y_sin, y_width)
-        wandb_logger.log({"gt": [wandb.Image(q_img, caption="q_img")]})
 
         with amp.autocast(enabled=self.enabled):
             lossd = self.loss_fn(xc, yc)

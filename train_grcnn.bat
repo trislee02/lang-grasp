@@ -1,0 +1,1 @@
+python train_network.py --dataset grasp-anything --dataset-path data/grasp-anything --description training_grasp_anything --use-depth 0
