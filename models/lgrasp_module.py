@@ -56,11 +56,11 @@ class LGraspModule(pl.LightningModule):
             loss = lossd['loss']
         self.log("train_loss", loss)
 
+        plot_img = [wandb.Image(x[0][0], caption=x[1][0]), 
+                    wandb.Image(self.model.out_logits_per_image[0], caption=f"{x[1][0]}-logits")]       
+        plot_img.extend([wandb.Image(self.model.out_image_features[0][i], caption=f"{x[1][0]}-image features channel {i}") for i in range(10)])
         wandb_logger = self.logger.experiment
-        wandb_logger.log_image(key="input_image", image=[x[0][0]], captions=[f"Input image"])
-        # wandb_logger.log({"plot": [wandb.Image(x[0][0], caption=x[1][0]), 
-        #                            wandb.Image(self.model.out_image_features[0][0], caption=f"{x[1][0]}-image features channel 0"),
-        #                            wandb.Image(self.model.out_logits_per_image[0], caption=f"{x[1][0]}-logits")]})
+        wandb_logger.log({"plot": plot_img})
                                  
         return loss
 
