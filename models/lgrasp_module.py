@@ -1,6 +1,7 @@
 import torch
 import torch.cuda.amp as amp
 import pytorch_lightning as pl
+import wandb
 from utils.metrics import GraspAccuracy
 from .lgrasp_net import LGraspNet
 from pytorch_lightning.utilities import grad_norm
@@ -45,6 +46,8 @@ class LGraspModule(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y, didx, rot, zoom_factor = batch
+        wandb_logger = self.logger.experiment
+        wandb_logger.log({"generated_images": [wandb.Image(x[0][0], caption="First image in batch")]})
         xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
         yc = [yy for yy in y]
         with amp.autocast(enabled=self.enabled):
