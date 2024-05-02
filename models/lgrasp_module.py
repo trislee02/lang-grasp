@@ -57,7 +57,10 @@ class LGraspModule(pl.LightningModule):
         self.log("train_loss", loss)
 
         wandb_logger = self.logger.experiment
-        wandb_logger.log_image(key="features", images=[lossd['images']['features'][0][0], lossd['images']['logits'][0]], caption=["image features channel 0", "logits"])
+        
+        wandb_logger.log({"gt": [wandb.Image(lossd['images']['features'][0][0], caption="image features channel 0")]})
+        wandb_logger.log({"pred": [wandb.Image(lossd['images']['logits'][0], caption="logits")]})
+                         
         return loss
 
     def training_epoch_end(self, outs):
