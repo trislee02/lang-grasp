@@ -31,7 +31,7 @@ def parse_args():
     # Network
     parser.add_argument('--network', type=str, default='grconvnet3',
                         help='Network name in inference/models')
-    parser.add_argument('--input-size', type=int, default=224,
+    parser.add_argument('--input-size', type=int, default=416,
                         help='Input image size for the network')
     parser.add_argument('--use-depth', type=int, default=1,
                         help='Use Depth image for training (1/0)')
@@ -83,8 +83,8 @@ def parse_args():
                         help='Training epochs')
     parser.add_argument('--batches-per-epoch', type=int, default=1000,
                         help='Batches per Epoch')
-    parser.add_argument('--optim', type=str, default='adam',
-                        help='Optmizer for the training. (adam or SGD)')
+    # parser.add_argument('--optim', type=str, default='adam',
+    #                     help='Optmizer for the training. (adam or SGD)')
     parser.add_argument("--accumulate_grad_batches", type=int, default=1,
                         help="accumulate N batches for gradient computation")
     parser.add_argument('--checkpoint-dir', type=str, default='checkpoints/',
@@ -155,8 +155,8 @@ def run():
     dataset = Dataset(args.dataset_path,
                       output_size=args.input_size,
                       ds_rotate=args.ds_rotate,
-                      random_rotate=True,
-                      random_zoom=True,
+                      random_rotate=False,
+                      random_zoom=False,
                       include_depth=args.use_depth,
                       include_rgb=args.use_rgb,
                       seen=args.seen)
