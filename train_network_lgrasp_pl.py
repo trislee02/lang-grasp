@@ -187,7 +187,7 @@ def run():
         dataset,
         batch_size=1,
         num_workers=args.num_workers,
-        sampler=val_sampler
+        sampler=train_sampler
     )
     logging.info('Done')
 
