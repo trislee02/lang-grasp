@@ -187,14 +187,13 @@ def run():
         dataset,
         batch_size=1,
         num_workers=args.num_workers,
-        sampler=train_sampler
+        sampler=train_sampler # TODO: Change to val_sampler
     )
     logging.info('Done')
 
     # Debugging
     logging.info('Loading network...')
-    net = make_model(args)
-
+    
     # Set up Pytorch Lightning Module
     if args.resume_checkpoint == '':
         model = LGraspModule(dataset=dataset,

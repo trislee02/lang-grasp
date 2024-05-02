@@ -255,45 +255,32 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         #         out_sin = self.scratch.head_block_sin[i](out_sin)
         #         out_width = self.scratch.head_block_width[i](out_width)
 
-        # out_pos = self.scratch.head_block_pos_1(out)
-        # out_cos = self.scratch.head_block_cos_1(out)
-        # out_sin = self.scratch.head_block_sin_1(out)
-        # out_width = self.scratch.head_block_width_1(out)
+        out_pos = self.scratch.head_block_pos_1(out)
+        out_cos = self.scratch.head_block_cos_1(out)
+        out_sin = self.scratch.head_block_sin_1(out)
+        out_width = self.scratch.head_block_width_1(out)
 
-        # if self.block_depth > 1:
-        #     out_pos = self.scratch.head_block_pos_2(out_pos)
-        #     out_cos = self.scratch.head_block_cos_2(out_cos)
-        #     out_sin = self.scratch.head_block_sin_2(out_sin)
-        #     out_width = self.scratch.head_block_width_2(out_width)
+        if self.block_depth > 1:
+            out_pos = self.scratch.head_block_pos_2(out_pos)
+            out_cos = self.scratch.head_block_cos_2(out_cos)
+            out_sin = self.scratch.head_block_sin_2(out_sin)
+            out_width = self.scratch.head_block_width_2(out_width)
 
-        # if self.block_depth > 2:
-        #     out_pos = self.scratch.head_block_pos_3(out_pos)
-        #     out_cos = self.scratch.head_block_cos_3(out_cos)
-        #     out_sin = self.scratch.head_block_sin_3(out_sin)
-        #     out_width = self.scratch.head_block_width_3(out_width)
+        if self.block_depth > 2:
+            out_pos = self.scratch.head_block_pos_3(out_pos)
+            out_cos = self.scratch.head_block_cos_3(out_cos)
+            out_sin = self.scratch.head_block_sin_3(out_sin)
+            out_width = self.scratch.head_block_width_3(out_width)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
         # Bilinear interpolation
-        out = self.scratch.output_conv_pos(out) # [batch_size, 1, H, W]
+        pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
+        cos_output = self.scratch.output_conv_cos(out_cos)
+        sin_output = self.scratch.output_conv_sin(out_sin)
+        width_output = self.scratch.output_conv_width(out_width)
+
         # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
-
-        out = F.relu(self.grcnn.bn1(self.grcnn.conv1(out)))
-        out = F.relu(self.grcnn.bn2(self.grcnn.conv2(out)))
-        out = F.relu(self.grcnn.bn3(self.grcnn.conv3(out)))
-        out = self.grcnn.res1(out)
-        out = self.grcnn.res2(out)
-        out = self.grcnn.res3(out)
-        out = self.grcnn.res4(out)
-        out = self.grcnn.res5(out)
-        out = F.relu(self.grcnn.bn4(self.grcnn.conv4(out)))
-        out = F.relu(self.grcnn.bn5(self.grcnn.conv5(out)))
-        out = self.grcnn.conv6(out)
-
-        pos_output = self.grcnn.pos_output(out)
-        cos_output = self.grcnn.cos_output(out)
-        sin_output = self.grcnn.sin_output(out)
-        width_output = self.grcnn.width_output(out)
 
         return pos_output, cos_output, sin_output, width_output
 
