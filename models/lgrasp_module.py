@@ -65,7 +65,7 @@ class LGraspModule(pl.LightningModule):
         return loss
 
     def training_epoch_end(self, outs):
-        pass
+        print(self.model.scratch.head_block_pos_1.weight.shape)
 
     def on_before_optimizer_step(self, optimizer, optimizer_idx):
         # Compute the 2-norm for each layer
@@ -79,9 +79,6 @@ class LGraspModule(pl.LightningModule):
         # wandb_logger.log(norms_scratch)
         # wandb_logger.log(norms_pretrained)
         pass
-
-    def on_after_optimizer_step(self, optimizer, optimizer_idx):
-        print(self.model.scratch.head_block_pos_1.weight.shape)
 
     def validation_step(self, batch, batch_idx):
         x, y, didx, rot, zoom_factor = batch
