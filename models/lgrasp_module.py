@@ -47,7 +47,7 @@ class LGraspModule(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y, didx, rot, zoom_factor = batch
         wandb_logger = self.logger.experiment
-        wandb_logger.log({"generated_images": [wandb.Image(x[0][0], caption="First image in batch")]})
+        wandb_logger.log({"image": [wandb.Image(x[0][0], caption=x[1][0])]})
         xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
         yc = [yy for yy in y]
         with amp.autocast(enabled=self.enabled):
@@ -62,14 +62,14 @@ class LGraspModule(pl.LightningModule):
     def on_before_optimizer_step(self, optimizer, optimizer_idx):
         # Compute the 2-norm for each layer
         # If using mixed precision, the gradients are already unscaled here
-        norms_grcnn = grad_norm(self.model.grcnn.width_output, norm_type=2)
-        # norms_scratch = grad_norm(self.model.scratch, norm_type=2)
-        # norms_pretrained = grad_norm(self.model.pretrained, norm_type=2)
+        norms_grcnn = grad_norm(self.model.grcnn, norm_type=2)
+        norms_scratch = grad_norm(self.model.scratch, norm_type=2)
+        norms_pretrained = grad_norm(self.model.pretrained, norm_type=2)
         # print("Gradient norms: ", norms)
         wandb_logger = self.logger.experiment
         wandb_logger.log(norms_grcnn)
-        # wandb_logger.log(norms_scratch)
-        # wandb_logger.log(norms_pretrained)
+        wandb_logger.log(norms_scratch)
+        wandb_logger.log(norms_pretrained)
 
     def validation_step(self, batch, batch_idx):
         x, y, didx, rot, zoom_factor = batch
