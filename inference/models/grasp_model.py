@@ -17,7 +17,8 @@ class GraspModel(nn.Module):
     def compute_loss(self, xc, yc):
         # print(f"Input shape: {xc.shape}") # [1, 3, 224, 224]
         y_pos, y_cos, y_sin, y_width = yc
-        pos_pred, cos_pred, sin_pred, width_pred = self(xc)
+        pos_pred, cos_pred, sin_pred, width_pred, images_features, logits = self(xc)
+
         # print(f"Prediction shape: {pos_pred.shape}, {cos_pred.shape}, {sin_pred.shape}, {width_pred.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
         # print(f"Ground truth shape: {y_pos.shape}, {y_cos.shape}, {y_sin.shape}, {y_width.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
 
@@ -27,7 +28,7 @@ class GraspModel(nn.Module):
         cos_loss = F.smooth_l1_loss(cos_pred, y_cos, reduction='sum') / batch_size
         sin_loss = F.smooth_l1_loss(sin_pred, y_sin, reduction='sum') / batch_size
         width_loss = F.smooth_l1_loss(width_pred, y_width, reduction='sum') / batch_size
-        
+
         return {
             'loss': p_loss + cos_loss + sin_loss + width_loss,
             'losses': {
@@ -41,7 +42,11 @@ class GraspModel(nn.Module):
                 'cos': cos_pred,
                 'sin': sin_pred,
                 'width': width_pred
-            }
+            },
+            'images': {
+                'features': images_features,
+                'logits': logits
+            },
         }
 
     def predict(self, xc):

@@ -225,6 +225,8 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         image_features = self.scratch.head1(path_1)
         # print(f"Image features shape: {image_features.shape}") # [batch_size, out_c, H/2, W/2]
 
+        out_image_features = image_features.detach().clone()
+
         imshape = image_features.shape
         image_features = image_features.permute(0,2,3,1).reshape(imshape[0], -1, self.out_c)
         # print(f"Image features shape (after reshaped and permute): {image_features.shape}") # [batch_size, H/2 * W/2, out_c] 
@@ -241,19 +243,9 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
 
+        out_logits_per_image = out.detach().clone()
+
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
-
-        # if self.block_depth > 0 and self.arch_option in [1, 2]:
-        #     out_pos = self.scratch.head_block_pos[0](out)
-        #     out_cos = self.scratch.head_block_cos[0](out)
-        #     out_sin = self.scratch.head_block_sin[0](out)
-        #     out_width = self.scratch.head_block_width[0](out)
-
-        #     for i in range(self.block_depth - 1):
-        #         out_pos = self.scratch.head_block_pos[i](out_pos)
-        #         out_cos = self.scratch.head_block_cos[i](out_cos)
-        #         out_sin = self.scratch.head_block_sin[i](out_sin)
-        #         out_width = self.scratch.head_block_width[i](out_width)
 
         out_pos = self.scratch.head_block_pos_1(out)
         out_cos = self.scratch.head_block_cos_1(out)
@@ -282,7 +274,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
 
-        return pos_output, cos_output, sin_output, width_output
+        return pos_output, cos_output, sin_output, width_output, out_image_features, out_logits_per_image
 
 class LGraspNet(LGrasp):
     """Network for semantic segmentation."""
@@ -298,8 +290,6 @@ class LGraspNet(LGrasp):
 
         if path is not None:
             self.load(path)
-
-
     
         
     
