@@ -58,7 +58,7 @@ class LGraspModule(pl.LightningModule):
 
         wandb_logger = self.logger.experiment
         
-        wandb_logger.log({"gt": [wandb.Image(x[0][0], caption="RGB Image")]})
+        wandb_logger.log({"rgb": [wandb.Image(x[0][0], caption=x[1][0])]})
         wandb_logger.log({"gt": [wandb.Image(lossd['images']['features'][0][0], caption="image features channel 0")]})
         wandb_logger.log({"pred": [wandb.Image(lossd['images']['logits'][0], caption="logits")]})
                          
