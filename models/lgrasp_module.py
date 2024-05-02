@@ -5,6 +5,8 @@ import wandb
 from utils.metrics import GraspAccuracy
 from .lgrasp_net import LGraspNet
 from pytorch_lightning.utilities import grad_norm
+from inference.post_process import post_process_output
+
 
 class LGraspModule(pl.LightningModule):
     def __init__(self, 
@@ -48,8 +50,15 @@ class LGraspModule(pl.LightningModule):
         x, y, didx, rot, zoom_factor = batch
         wandb_logger = self.logger.experiment
         wandb_logger.log({"image": [wandb.Image(x[0][0], caption=x[1][0])]})
+        
         xc = (x[0], x[1]) # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple of `batch_size`` prompts
         yc = [yy for yy in y]
+        
+        y_pos, y_cos, y_sin, y_width = yc[0].detach().clone()
+
+        q_img, ang_img, width_img = post_process_output(y_pos, y_cos, y_sin, y_width)
+        wandb_logger.log({"gt": [wandb.Image(q_img, caption="q_img")]})
+
         with amp.autocast(enabled=self.enabled):
             lossd = self.loss_fn(xc, yc)
             loss = lossd['loss']
