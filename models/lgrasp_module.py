@@ -57,10 +57,10 @@ class LGraspModule(pl.LightningModule):
         self.log("train_loss", loss)
 
         wandb_logger = self.logger.experiment
-        
-        wandb_logger.log({"plot": [wandb.Image(x[0][0], caption=x[1][0]), 
-                                  wandb.Image(lossd['images']['features'][0][0], caption=f"{x[1][0]}-image features channel 0"),
-                                  wandb.Image(lossd['images']['logits'][0], caption=f"{x[1][0]}-logits")]})
+        wandb_logger.log_image(key="input_image", image=[x[0][0]], captions=[f"Input image"])
+        # wandb_logger.log({"plot": [wandb.Image(x[0][0], caption=x[1][0]), 
+        #                            wandb.Image(self.model.out_image_features[0][0], caption=f"{x[1][0]}-image features channel 0"),
+        #                            wandb.Image(self.model.out_logits_per_image[0], caption=f"{x[1][0]}-logits")]})
                                  
         return loss
 
@@ -68,9 +68,10 @@ class LGraspModule(pl.LightningModule):
         pass
 
     def on_train_batch_end(self, outputs, batch, batch_idx):
-        print(self.model.scratch.head_block_pos_1.depthwise.depthwise.weight)
-        print(self.model.scratch.head_block_pos_2.depthwise.depthwise.weight)
-        print(self.model.scratch.head_block_pos_3.depthwise.depthwise.weight)
+        pass
+        # print(self.model.scratch.head_block_pos_1.depthwise.depthwise.weight)
+        # print(self.model.scratch.head_block_pos_2.depthwise.depthwise.weight)
+        # print(self.model.scratch.head_block_pos_3.depthwise.depthwise.weight)
 
     def on_before_optimizer_step(self, optimizer, optimizer_idx):
         # Compute the 2-norm for each layer

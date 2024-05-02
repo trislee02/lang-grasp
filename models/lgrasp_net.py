@@ -205,7 +205,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         image_features = self.scratch.head1(path_1)
         # print(f"Image features shape: {image_features.shape}") # [batch_size, out_c, H/2, W/2]
 
-        out_image_features = image_features.detach().clone()
+        self.out_image_features = image_features.detach().clone()
 
         imshape = image_features.shape
         image_features = image_features.permute(0,2,3,1).reshape(imshape[0], -1, self.out_c)
@@ -223,11 +223,9 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
 
-        out_logits_per_image = out.detach().clone()
+        self.out_logits_per_image = out.detach().clone()
 
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
-
-
 
         out_pos = self.scratch.head_block_pos_1(out)
         out_cos = self.scratch.head_block_cos_1(out)
@@ -256,7 +254,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
 
-        return pos_output, cos_output, sin_output, width_output, out_image_features, out_logits_per_image
+        return pos_output, cos_output, sin_output, width_output
 
 class LGraspNet(LGrasp):
     """Network for semantic segmentation."""
