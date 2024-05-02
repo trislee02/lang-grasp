@@ -58,14 +58,19 @@ class LGraspModule(pl.LightningModule):
 
         wandb_logger = self.logger.experiment
         
-        wandb_logger.log({"rgb": [wandb.Image(x[0][0], caption=x[1][0])]})
-        wandb_logger.log({"gt": [wandb.Image(lossd['images']['features'][0][0], caption="image features channel 0")]})
-        wandb_logger.log({"pred": [wandb.Image(lossd['images']['logits'][0], caption="logits")]})
-                         
+        wandb_logger.log({"plot": [wandb.Image(x[0][0], caption=x[1][0]), 
+                                  wandb.Image(lossd['images']['features'][0][0], caption=f"{x[1][0]}-image features channel 0"),
+                                  wandb.Image(lossd['images']['logits'][0], caption=f"{x[1][0]}-logits")]})
+                                 
         return loss
 
     def training_epoch_end(self, outs):
-        print(self.model.scratch.head_block_pos_1.weight.shape)
+        pass
+
+    def on_train_batch_end(self, outputs, batch, batch_idx):
+        print(self.model.scratch.head_block_pos_1.depthwise.depthwise.weight)
+        print(self.model.scratch.head_block_pos_2.depthwise.depthwise.weight)
+        print(self.model.scratch.head_block_pos_3.depthwise.depthwise.weight)
 
     def on_before_optimizer_step(self, optimizer, optimizer_idx):
         # Compute the 2-norm for each layer
