@@ -121,7 +121,7 @@ def _make_srb_block(activation='relu'):
         Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
     )
 
-    return srb
+    return srb.cuda()
 
 lseg_out = {}
 
