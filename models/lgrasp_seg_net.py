@@ -209,7 +209,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         self.srb = _make_srb_block(activation=kwargs["activation"])   
 
-        self.grcnn = _make_grcnn(input_channels=1, output_channels=1, channel_size=kwargs["channel_size"])    
+        self.grcnn = _make_grcnn(input_channels=1, output_channels=1, channel_size=32)    
 
     def forward(self, x_in, prompt=''):
         # x[0] is a Tensor [batch_size, c_channels, h, w]
