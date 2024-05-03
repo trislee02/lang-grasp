@@ -26,12 +26,12 @@ class LSegModule(LSegmentationModule):
             data_path, dataset, batch_size, base_lr, max_epochs, **kwargs
         )
 
-        # if dataset == "citys":
-        #     self.base_size = 2048
-        #     self.crop_size = 768
-        # else:
-        #     self.base_size = 520
-        #     self.crop_size = 480
+        if dataset == "citys":
+            self.base_size = 2048
+            self.crop_size = 768
+        else:
+            self.base_size = 520
+            self.crop_size = 480
 
         # use_pretrained = True
         # norm_mean= [0.5, 0.5, 0.5]
