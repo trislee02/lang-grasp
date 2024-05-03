@@ -1,37 +1,28 @@
-import torch
-import torch.nn as nn
-import clip
+from models import LGraspModule
+from PIL import Image
+import numpy as np
+from torchvision import transforms
+import matplotlib.pyplot as plt
 
-class depthwise_conv(nn.Module):
-    def __init__(self, kernel_size=3, stride=1, padding=1):
-        super(depthwise_conv, self).__init__()
-        self.depthwise = nn.Conv2d(1, 1, kernel_size=kernel_size, stride=stride, padding=padding)
+module = LGraspModule()
 
-    def forward(self, x):
-        # support for 4D tensor with NCHW
-        C, H, W = x.shape[1:]
-        x = x.reshape(-1, 1, H, W)
-        x = self.depthwise(x)
-        x = x.view(-1, C, H, W)
-        return x
+img_path = "data\grasp-anything\seen\image\0a5bd779e492513880bef534543ff031b169a045ed7ac809c5600c3268038f4d.jpg"
+image = Image.open(img_path)
+image = np.array(image)
+transform = transforms.Compose(
+    [
+        transforms.ToTensor(),
+        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+    ]
+)
+image = transform(image).unsqueeze(0)
 
+text_features, image_features = module(image, ['grasp the mug at the handle'])
 
-class depthwise_block(nn.Module):
-    def __init__(self, kernel_size=3, stride=1, padding=1, activation='relu'):
-        super(depthwise_block, self).__init__()
-        self.depthwise = depthwise_conv(kernel_size=3, stride=1, padding=1)
-        if activation == 'relu':
-            self.activation = nn.ReLU()
-        elif activation == 'lrelu':
-            self.activation = nn.LeakyReLU()
-        elif activation == 'tanh':
-            self.activation = nn.Tanh()
-
-    def forward(self, x, act=True):
-        x = self.depthwise(x)
-        if act:
-            x = self.activation(x)
-        return x
-
-a = depthwise_block()
-print(a.depthwise.depthwise.weight)
+fig, ax = plt.subplots(nrows=5, ncols=7)
+for r, row in enumerate(ax):
+    for c, col in enumerate(row):
+        img = image_features[0][r*len(row) + c].detach().cpu().numpy()
+        img = (img - img.min()) / (img.max() - img.min())
+        col.imshow(img, cmap='gray')
+plt.savefig(f"image_features.png")

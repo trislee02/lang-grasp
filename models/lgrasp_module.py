@@ -3,7 +3,8 @@ import torch.cuda.amp as amp
 import pytorch_lightning as pl
 import wandb
 from utils.metrics import GraspAccuracy
-from .lgrasp_net import LGraspNet
+# from .lgrasp_net import LGraspNet
+from .lgrasp_seg_net import LGraspNet
 from pytorch_lightning.utilities import grad_norm
 from inference.post_process import post_process_output
 
@@ -107,6 +108,8 @@ class LGraspModule(pl.LightningModule):
     def configure_optimizers(self):
         params_list = [
             {"params": self.model.pretrained.parameters(), "lr": self.base_lr},
+            {"params": self.model.lseg.pretrained.parameters(), "lr": self.base_lr},
+            {"params": self.model.lseg.scratch.parameters(), "lr": self.base_lr * 10},
         ]
         if hasattr(self.model, "scratch"):
             print("Found output scratch")
