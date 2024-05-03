@@ -90,19 +90,48 @@ def _make_fusion_block(features, use_bn):
         align_corners=True,
     )
 
+def _make_srb_block(activation='relu'):
+    srb = nn.Module()
+    srb.head_block_pos_1 = depthwise_block(activation=activation)
+    srb.head_block_cos_1 = depthwise_block(activation=activation)
+    srb.head_block_sin_1 = depthwise_block(activation=activation)
+    srb.head_block_width_1 = depthwise_block(activation=activation)
+
+    srb.head_block_pos_2 = depthwise_block(activation=activation)
+    srb.head_block_cos_2 = depthwise_block(activation=activation)
+    srb.head_block_sin_2 = depthwise_block(activation=activation)
+    srb.head_block_width_2 = depthwise_block(activation=activation)
+
+    srb.head_block_pos_3 = depthwise_block(activation=activation)
+    srb.head_block_cos_3 = depthwise_block(activation=activation)
+    srb.head_block_sin_3 = depthwise_block(activation=activation)
+    srb.head_block_width_3 = depthwise_block(activation=activation)
+
+    srb.output_conv_pos = nn.Sequential(
+        Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
+    )
+    srb.output_conv_cos = nn.Sequential(
+        Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
+    )
+    srb.output_conv_sin = nn.Sequential(
+        Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
+    )
+    srb.output_conv_width = nn.Sequential(
+        Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
+    )
+
+    return srb
+
 class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
     def __init__(
         self,
         features=256,
         backbone="clip_vitl16_384",
         readout="project",
-        channels_last=False,
         use_bn=False,
         **kwargs,
     ):
         super(LGrasp, self).__init__()
-
-        self.channels_last = channels_last
 
         hooks = {
             "clip_vitl16_384": [5, 11, 17, 23],
@@ -133,40 +162,12 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
             self.out_c = 512
         self.scratch.head1 = nn.Conv2d(features, self.out_c, kernel_size=1)
 
-        self.arch_option = kwargs["arch_option"]
-        self.block_depth = kwargs['block_depth']
-        if self.block_depth > 0:
-            self.scratch.head_block_pos_1 = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_cos_1 = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_sin_1 = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_width_1 = depthwise_block(activation=kwargs["activation"])
-
-            self.scratch.head_block_pos_2 = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_cos_2 = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_sin_2 = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_width_2 = depthwise_block(activation=kwargs["activation"])
-
-            self.scratch.head_block_pos_3 = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_cos_3 = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_sin_3 = depthwise_block(activation=kwargs["activation"])
-            self.scratch.head_block_width_3 = depthwise_block(activation=kwargs["activation"])
-
-        self.scratch.output_conv_pos = nn.Sequential(
-            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
-        )
-        self.scratch.output_conv_cos = nn.Sequential(
-            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
-        )
-        self.scratch.output_conv_sin = nn.Sequential(
-            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
-        )
-        self.scratch.output_conv_width = nn.Sequential(
-            Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
-        )
+        self.srb = _make_srb_block(activation=kwargs["activation"])
+        
 
     def forward(self, x_in, prompt=''):
-        # Check if x is of type tuple, i.e. from a dataloader
-        # x[0] is a Tensor [batch_size, c, h, w], x[1] is a Tuple with `batch_size` prompts
+        # x[0] is a Tensor [batch_size, c_channels, h, w]
+        # x[1] is a Tuple with `batch_size` prompts
         if isinstance(x_in, tuple):
             x = x_in[0]
             prompt = list(x_in[1])
@@ -178,9 +179,6 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Text (after tokenize) length: {len(text)}") # = batch_size
         # print(f"Image shape: {x.shape}") # [batch_size, 3, H, W] # HxW is the input size
-
-        if self.channels_last == True:
-            x.contiguous(memory_format=torch.channels_last)
 
         layer_1, layer_2, layer_3, layer_4 = forward_vit(self.pretrained, x)
 
@@ -197,7 +195,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         text = text.to(x.device)
         self.logit_scale = self.logit_scale.to(x.device)
         # Encode text features
-        text_features = self.clip_pretrained.encode_text(text)
+        text_features = self.clip_pretrained.encode_text(text) # [batch_size, out_c]
         text_features = text_features.unsqueeze(1)
         # print(f"Text features shape: {text_features.shape}") # [batch_size, 1, out_c] 
 
@@ -215,8 +213,6 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         
-        # print(f"Logit scale shape: {self.logit_scale.shape}") # []
-
         logits_per_image = self.logit_scale * image_features.half() @ text_features.mT
 
         # print(f"Logits per image shape: {logits_per_image.shape}") # [batch_size, H/2 * W/2, 1]
@@ -227,30 +223,28 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        out_pos = self.scratch.head_block_pos_1(out)
-        out_cos = self.scratch.head_block_cos_1(out)
-        out_sin = self.scratch.head_block_sin_1(out)
-        out_width = self.scratch.head_block_width_1(out)
+        out_pos = self.srb.head_block_pos_1(out)
+        out_cos = self.srb.head_block_cos_1(out)
+        out_sin = self.srb.head_block_sin_1(out)
+        out_width = self.srb.head_block_width_1(out)
 
-        if self.block_depth > 1:
-            out_pos = self.scratch.head_block_pos_2(out_pos)
-            out_cos = self.scratch.head_block_cos_2(out_cos)
-            out_sin = self.scratch.head_block_sin_2(out_sin)
-            out_width = self.scratch.head_block_width_2(out_width)
+        out_pos = self.srb.head_block_pos_2(out_pos)
+        out_cos = self.srb.head_block_cos_2(out_cos)
+        out_sin = self.srb.head_block_sin_2(out_sin)
+        out_width = self.srb.head_block_width_2(out_width)
 
-        if self.block_depth > 2:
-            out_pos = self.scratch.head_block_pos_3(out_pos)
-            out_cos = self.scratch.head_block_cos_3(out_cos)
-            out_sin = self.scratch.head_block_sin_3(out_sin)
-            out_width = self.scratch.head_block_width_3(out_width)
+        out_pos = self.srb.head_block_pos_3(out_pos)
+        out_cos = self.srb.head_block_cos_3(out_cos)
+        out_sin = self.srb.head_block_sin_3(out_sin)
+        out_width = self.srb.head_block_width_3(out_width)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
         # Bilinear interpolation
-        pos_output = self.scratch.output_conv_pos(out_pos) # [batch_size, 1, H, W]
-        cos_output = self.scratch.output_conv_cos(out_cos)
-        sin_output = self.scratch.output_conv_sin(out_sin)
-        width_output = self.scratch.output_conv_width(out_width)
+        pos_output = self.srb.output_conv_pos(out_pos) # [batch_size, 1, H, W]
+        cos_output = self.srb.output_conv_cos(out_cos)
+        sin_output = self.srb.output_conv_sin(out_sin)
+        width_output = self.srb.output_conv_width(out_width)
 
         # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
 
@@ -258,9 +252,8 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
 class LGraspNet(LGrasp):
     """Network for semantic segmentation."""
-    def __init__(self, path=None, scale_factor=0.5, crop_size=480, **kwargs):
+    def __init__(self, scale_factor=0.5, crop_size=480, **kwargs):
 
-        features = kwargs["features"] if "features" in kwargs else 256
         kwargs["use_bn"] = True
 
         self.crop_size = crop_size
@@ -268,8 +261,6 @@ class LGraspNet(LGrasp):
 
         super().__init__(**kwargs)
 
-        if path is not None:
-            self.load(path)
     
         
     

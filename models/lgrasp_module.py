@@ -16,16 +16,12 @@ class LGraspModule(pl.LightningModule):
                  weight_decay=1e-4,
                  backbone='clip_vitl16_384',
                  num_features=256,
-                 arch_option=0,
-                 block_depth=0,
                  activation='lrelu',):
         super().__init__()
         self.model = LGraspNet(
             backbone=backbone,
             features=num_features,
             crop_size=224,
-            arch_option=arch_option,
-            block_depth=block_depth,
             activation=activation,
         )
         self.loss_fn = self.model.compute_loss

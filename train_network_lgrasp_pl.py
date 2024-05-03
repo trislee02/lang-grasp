@@ -50,10 +50,6 @@ def parse_args():
                         help="backbone network")
     parser.add_argument('--num-features', type=int, default=256,
                         help="number of features that go from encoder to decoder")
-    parser.add_argument('--arch-option', type=int, default=0,
-                        help="which kind of architecture to be used")
-    parser.add_argument('--block-depth', type=int, default=0,
-                        help="how many blocks should be used")
     parser.add_argument("--activation", choices=['lrelu', 'tanh'], default="lrelu",
                         help="use which activation to activate the block")
 
@@ -202,8 +198,6 @@ def run():
                              weight_decay=args.weight_decay,
                              backbone=args.backbone,
                              num_features=args.num_features,
-                             arch_option=args.arch_option,
-                             block_depth=args.block_depth,
                              activation=args.activation,)
     else:
         logging.info('Resuming training from checkpoint: {}'.format(args.resume_checkpoint))
