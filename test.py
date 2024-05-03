@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 module = LGraspModule()
 
-img_path = "data\grasp-anything\seen\image\0a5bd779e492513880bef534543ff031b169a045ed7ac809c5600c3268038f4d.jpg"
+img_path = "data/grasp-anything/seen/image/0a5bd779e492513880bef534543ff031b169a045ed7ac809c5600c3268038f4d.jpg"
 image = Image.open(img_path)
 image = np.array(image)
 transform = transforms.Compose(
