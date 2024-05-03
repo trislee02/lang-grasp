@@ -196,25 +196,26 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
             prompt = list(x_in[1])
 
         text_features, image_features = self.lseg_net(x, prompt, features_only=True)
+        # return text_features, image_features
 
         text_features = text_features.unsqueeze(1)
-        # print(f"Text features shape: {text_features.shape}") # [batch_size, 1, out_c] 
+        print(f"Text features shape: {text_features.shape}") # [batch_size, 1, out_c] 
 
         imshape = image_features.shape
         image_features = image_features.permute(0,2,3,1).reshape(imshape[0], -1, self.out_c)
-        # print(f"Image features shape (after reshaped and permute): {image_features.shape}") # [batch_size, H/2 * W/2, out_c] 
+        print(f"Image features shape (after reshaped and permute): {image_features.shape}") # [batch_size, H/2 * W/2, out_c] 
 
         # normalized features
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         
-        logits_per_image = self.logit_scale * image_features.half() @ text_features.mT
+        logits_per_image = self.lseg_net.logit_scale * image_features.half() @ text_features.mT
 
-        # print(f"Logits per image shape: {logits_per_image.shape}") # [batch_size, H/2 * W/2, 1]
+        print(f"Logits per image shape: {logits_per_image.shape}") # [batch_size, H/2 * W/2, 1]
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
 
-        return 1, out.detach().clone()
+        return 1, out
 
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
