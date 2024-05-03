@@ -100,7 +100,10 @@ def _make_srb_block(activation='lrelu'):
         Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
     )
 
-    print(f"Weight: {srb.head_block_pos_1.depthwise.depthwise.weight}")
+    for m in srb.modules():
+        if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
+            print("Init weights")
+            nn.init.xavier_uniform_(m.weight, gain=1)
 
     return srb.cuda()
 
