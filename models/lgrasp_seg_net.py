@@ -194,7 +194,8 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         if isinstance(x_in, tuple):
             x = x_in[0]
             prompt = list(x_in[1])
-
+        print(f"Length of prompt: {len(prompt)}")
+        
         text_features, image_features = self.lseg_net(x, prompt, features_only=True)
         # return text_features, image_features
 
