@@ -102,7 +102,6 @@ def _make_srb_block(activation='lrelu'):
 
     for m in srb.modules():
         if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
-            print("Init weights")
             nn.init.xavier_uniform_(m.weight, gain=1)
 
     return srb.cuda()
@@ -205,9 +204,9 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         out_sin = self.srb.head_block_sin_1(out)
         out_width = self.srb.head_block_width_1(out)
 
-        print(out_pos)
+        print(out_width)
 
-        return out_pos, out_pos
+        return out_pos, out_width
     
 
     
