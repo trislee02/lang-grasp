@@ -57,7 +57,11 @@ class LGraspModule(pl.LightningModule):
                     wandb.Image(lossd['pred']['pos'][0][0], caption=f"{x[1][0]}-pred_pos"),
                     wandb.Image(lossd['pred']['cos'][0][0], caption=f"{x[1][0]}-pred_cos"),
                     wandb.Image(lossd['pred']['sin'][0][0], caption=f"{x[1][0]}-pred_sin"),
-                    wandb.Image(lossd['pred']['width'][0][0], caption=f"{x[1][0]}-pred_width")]  
+                    wandb.Image(lossd['pred']['width'][0][0], caption=f"{x[1][0]}-pred_width"),
+                    wandb.Image(lossd['gt']['pos'][0][0], caption=f"{x[1][0]}-gt_pos"),
+                    wandb.Image(lossd['gt']['cos'][0][0], caption=f"{x[1][0]}-gt_cos"),
+                    wandb.Image(lossd['gt']['sin'][0][0], caption=f"{x[1][0]}-gt_sin"),
+                    wandb.Image(lossd['gt']['width'][0][0], caption=f"{x[1][0]}-gt_width")]  
              
         wandb_logger = self.logger.experiment
         wandb_logger.log({"plot": plot_img})
@@ -121,7 +125,7 @@ class LGraspModule(pl.LightningModule):
                 weight_decay=self.weight_decay,
         )
         sch = torch.optim.lr_scheduler.LambdaLR(
-            opt, lambda x: pow(1.0 - x / self.epochs, 0.9), verbose=True
+            opt, lambda x: pow(1.0 - x / self.epochs, 0.9), # verbose=True
         )
 
         return [opt], [sch]

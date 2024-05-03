@@ -77,15 +77,15 @@ def _make_srb_block(activation='lrelu'):
     srb.head_block_sin_1 = depthwise_block(activation=activation)
     srb.head_block_width_1 = depthwise_block(activation=activation)
 
-    srb.head_block_pos_2 = depthwise_block(activation=activation)
-    srb.head_block_cos_2 = depthwise_block(activation=activation)
-    srb.head_block_sin_2 = depthwise_block(activation=activation)
-    srb.head_block_width_2 = depthwise_block(activation=activation)
+    # srb.head_block_pos_2 = depthwise_block(activation=activation)
+    # srb.head_block_cos_2 = depthwise_block(activation=activation)
+    # srb.head_block_sin_2 = depthwise_block(activation=activation)
+    # srb.head_block_width_2 = depthwise_block(activation=activation)
 
-    srb.head_block_pos_3 = depthwise_block(activation=activation)
-    srb.head_block_cos_3 = depthwise_block(activation=activation)
-    srb.head_block_sin_3 = depthwise_block(activation=activation)
-    srb.head_block_width_3 = depthwise_block(activation=activation)
+    # srb.head_block_pos_3 = depthwise_block(activation=activation)
+    # srb.head_block_cos_3 = depthwise_block(activation=activation)
+    # srb.head_block_sin_3 = depthwise_block(activation=activation)
+    # srb.head_block_width_3 = depthwise_block(activation=activation)
 
     srb.output_conv_pos = nn.Sequential(
         Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
@@ -204,15 +204,15 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         out_sin = self.srb.head_block_sin_1(out)
         out_width = self.srb.head_block_width_1(out)
     
-        out_pos = self.srb.head_block_pos_2(out_pos)
-        out_cos = self.srb.head_block_cos_2(out_cos)
-        out_sin = self.srb.head_block_sin_2(out_sin)
-        out_width = self.srb.head_block_width_2(out_width)
+        # out_pos = self.srb.head_block_pos_2(out_pos)
+        # out_cos = self.srb.head_block_cos_2(out_cos)
+        # out_sin = self.srb.head_block_sin_2(out_sin)
+        # out_width = self.srb.head_block_width_2(out_width)
 
-        out_pos = self.srb.head_block_pos_3(out_pos)
-        out_cos = self.srb.head_block_cos_3(out_cos)
-        out_sin = self.srb.head_block_sin_3(out_sin)
-        out_width = self.srb.head_block_width_3(out_width)
+        # out_pos = self.srb.head_block_pos_3(out_pos)
+        # out_cos = self.srb.head_block_cos_3(out_cos)
+        # out_sin = self.srb.head_block_sin_3(out_sin)
+        # out_width = self.srb.head_block_width_3(out_width)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
