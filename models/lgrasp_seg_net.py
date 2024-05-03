@@ -241,10 +241,10 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         
         # Test
-        # out_pos = self.srb.head_block_pos_1(out)
-        # out_cos = self.srb.head_block_cos_1(out)
-        # out_sin = self.srb.head_block_sin_1(out)
-        # out_width = self.srb.head_block_width_1(out)
+        out_pos = self.srb.head_block_pos_1(out)
+        out_cos = self.srb.head_block_cos_1(out)
+        out_sin = self.srb.head_block_sin_1(out)
+        out_width = self.srb.head_block_width_1(out)
     
         # out_pos = self.srb.head_block_pos_2(out_pos)
         # out_cos = self.srb.head_block_cos_2(out_cos)
@@ -282,10 +282,10 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         # width_output = self.srb.output_conv_width(out_width)
 
         # Debug
-        pos_output = self.srb.output_conv_pos(out) # [batch_size, 1, H, W]
-        cos_output = self.srb.output_conv_cos(out)
-        sin_output = self.srb.output_conv_sin(out)
-        width_output = self.srb.output_conv_width(out)
+        pos_output = self.srb.output_conv_pos(out_pos) # [batch_size, 1, H, W]
+        cos_output = self.srb.output_conv_cos(out_cos)
+        sin_output = self.srb.output_conv_sin(out_sin)
+        width_output = self.srb.output_conv_width(out_width)
 
         # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
 
