@@ -111,39 +111,6 @@ class LGraspModule(pl.LightningModule):
             {"params": self.model.lseg_net.scratch.parameters(), "lr": self.base_lr * 10},
             {"params": self.model.srb.parameters(), "lr": self.base_lr * 10}
         ]
-        if hasattr(self.model, "scratch"):
-            print("Found output scratch")
-            params_list.append(
-                {"params": self.model.scratch.parameters(), "lr": self.base_lr * 10}
-            )
-        if hasattr(self.model, "grcnn"):
-            print("Found grcnn")
-            params_list.append(
-                {"params": self.model.grcnn.parameters(), "lr": self.base_lr}
-            )
-        if hasattr(self.model, "auxlayer"):
-            print("Found auxlayer")
-            params_list.append(
-                {"params": self.model.auxlayer.parameters(), "lr": self.base_lr * 10}
-            )
-        if hasattr(self.model, "scale_inv_conv"):
-            print(self.model.scale_inv_conv)
-            print("Found scaleinv layers")
-            params_list.append(
-                {
-                    "params": self.model.scale_inv_conv.parameters(),
-                    "lr": self.base_lr * 10,
-                }
-            )
-            params_list.append(
-                {"params": self.model.scale2_conv.parameters(), "lr": self.base_lr * 10}
-            )
-            params_list.append(
-                {"params": self.model.scale3_conv.parameters(), "lr": self.base_lr * 10}
-            )
-            params_list.append(
-                {"params": self.model.scale4_conv.parameters(), "lr": self.base_lr * 10}
-            )
 
         opt = torch.optim.Adam(
                 params_list,
