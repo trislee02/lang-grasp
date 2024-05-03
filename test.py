@@ -17,7 +17,7 @@ transform = transforms.Compose(
 )
 image = transform(image).unsqueeze(0)
 
-text_features, image_features = module(image, ['grasp the mug at the handle'])
+text_features, image_features = module((image, ('grasp the mug at the handle')))
 
 fig, ax = plt.subplots(nrows=5, ncols=7)
 for r, row in enumerate(ax):
