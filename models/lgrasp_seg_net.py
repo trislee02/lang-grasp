@@ -159,6 +159,8 @@ def make_lseg():
 
     # model
     lseg_net = module.net
+    lseg_net = lseg_net.cuda()
+
     lseg_net.scratch.head1.register_forward_hook(get_image_feature())
 
     return lseg_net
