@@ -222,6 +222,8 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         out_sin = self.srb.head_block_sin_1(out)
         out_width = self.srb.head_block_width_1(out)
 
+        return out_pos, out_cos
+    
         out_pos = self.srb.head_block_pos_2(out_pos)
         out_cos = self.srb.head_block_cos_2(out_cos)
         out_sin = self.srb.head_block_sin_2(out_sin)
@@ -234,6 +236,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
+
         # Bilinear interpolation
         pos_output = self.srb.output_conv_pos(out_pos) # [batch_size, 1, H, W]
         cos_output = self.srb.output_conv_cos(out_cos)
@@ -241,7 +244,6 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         width_output = self.srb.output_conv_width(out_width)
 
         # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
-        return pos_output, cos_output
     
         return pos_output, cos_output, sin_output, width_output
 

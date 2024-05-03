@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 import pytorch_lightning as pl
 from .lsegmentation_module import LSegmentationModule
 from .lseg_net import LSegNet
-from encoding.models.sseg.base import up_kwargs
+# from encoding.models.sseg.base import up_kwargs
 
 import os
 import clip

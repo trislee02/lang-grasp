@@ -14,16 +14,16 @@ import pytorch_lightning as pl
 
 # from data import get_dataset, get_available_datasets
 
-from encoding.models import get_segmentation_model
-from encoding.nn import SegmentationLosses
+# from encoding.models import get_segmentation_model
+# from encoding.nn import SegmentationLosses
 
-from encoding.utils import batch_pix_accuracy, batch_intersection_union
+# from encoding.utils import batch_pix_accuracy, batch_intersection_union
 
 # add mixed precision
 import torch.cuda.amp as amp
 import numpy as np
 
-from encoding.utils import SegmentationMetric
+# from encoding.utils import SegmentationMetric
 
 class LSegmentationModule(pl.LightningModule):
     def __init__(self, data_path, dataset, batch_size, base_lr, max_epochs, **kwargs):
