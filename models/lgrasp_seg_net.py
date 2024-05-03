@@ -192,8 +192,6 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         text_features, image_features = self.lseg_net(x, prompt, features_only=True)
 
-        return text_features, image_features
-
         text_features = text_features.unsqueeze(1)
         # print(f"Text features shape: {text_features.shape}") # [batch_size, 1, out_c] 
 
@@ -210,6 +208,8 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         # print(f"Logits per image shape: {logits_per_image.shape}") # [batch_size, H/2 * W/2, 1]
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
+
+        return out, out
 
         self.out_logits_per_image = out.detach().clone()
 
