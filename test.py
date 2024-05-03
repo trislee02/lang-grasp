@@ -19,7 +19,7 @@ image = transform(image).unsqueeze(0)
 image = image.cuda()
 text_features, image_features = module((image, ('grasp the mug at the handle')))
 
-fig, ax = plt.subplots(nrows=5, ncols=7)
+fig, ax = plt.subplots(nrows=1, ncols=1)
 img = image_features[0][0].detach().cpu().numpy()
 img = (img - img.min()) / (img.max() - img.min())
 ax.imshow(img)
