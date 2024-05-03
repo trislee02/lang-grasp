@@ -190,7 +190,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         self.srb = _make_srb_block(activation=kwargs["activation"])
 
         self.conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1).cuda()
-        self.activation = nn.ReLU().cuda()
+        self.activation = nn.LeakyReLU().cuda()
         
 
     def forward(self, x_in, prompt=''):
