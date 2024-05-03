@@ -219,13 +219,12 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         # print(f"Logits per image shape: {logits_per_image.shape}") # [batch_size, H/2 * W/2, 1]
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
-        print(out)
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
         # Test
         out = self.conv2d(out)
-        print(out)
         out = self.activation(out)
+        print(out)
 
         return out, out
     
