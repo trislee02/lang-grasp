@@ -166,11 +166,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         self.lseg_net = make_lseg()  
 
-        self.srb = _make_srb_block(activation=kwargs["activation"])
-
-        self.conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1).cuda()
-        self.activation = nn.LeakyReLU().cuda()
-        
+        self.srb = _make_srb_block(activation=kwargs["activation"])       
 
     def forward(self, x_in, prompt=''):
         # x[0] is a Tensor [batch_size, c_channels, h, w]
@@ -202,13 +198,14 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # Test
         out_pos = self.srb.head_block_pos_1(out)
-        print(out_pos)
-
-        return out_pos, out_pos
-    
         out_cos = self.srb.head_block_cos_1(out)
         out_sin = self.srb.head_block_sin_1(out)
         out_width = self.srb.head_block_width_1(out)
+
+        print(out_width)
+
+        return out_width, out_width
+    
 
     
         out_pos = self.srb.head_block_pos_2(out_pos)
