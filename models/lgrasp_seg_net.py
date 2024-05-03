@@ -44,7 +44,7 @@ class depthwise_conv(nn.Module):
 
 
 class depthwise_block(nn.Module):
-    def __init__(self, kernel_size=3, stride=1, padding=1, activation='relu'):
+    def __init__(self, kernel_size=3, stride=1, padding=1, activation='lrelu'):
         super(depthwise_block, self).__init__()
         self.depthwise = depthwise_conv(kernel_size=3, stride=1, padding=1)
         if activation == 'relu':
@@ -60,27 +60,6 @@ class depthwise_block(nn.Module):
             x = self.activation(x)
         return x
 
-
-class bottleneck_block(nn.Module):
-    def __init__(self, kernel_size=3, stride=1, padding=1, activation='relu'):
-        super(bottleneck_block, self).__init__()
-        self.depthwise = depthwise_conv(kernel_size=3, stride=1, padding=1)
-        if activation == 'relu':
-            self.activation = nn.ReLU()
-        elif activation == 'lrelu':
-            self.activation = nn.LeakyReLU()
-        elif activation == 'tanh':
-            self.activation = nn.Tanh()
-
-
-    def forward(self, x, act=True):
-        sum_layer = x.max(dim=1, keepdim=True)[0]
-        x = self.depthwise(x)
-        x = x + sum_layer
-        if act:
-            x = self.activation(x)
-        return x
-
 def _make_fusion_block(features, use_bn):
     return FeatureFusionBlock_custom(
         features,
@@ -91,7 +70,7 @@ def _make_fusion_block(features, use_bn):
         align_corners=True,
     )
 
-def _make_srb_block(activation='relu'):
+def _make_srb_block(activation='lrelu'):
     srb = nn.Module()
     srb.head_block_pos_1 = depthwise_block(activation=activation)
     srb.head_block_cos_1 = depthwise_block(activation=activation)
@@ -222,13 +201,11 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
         # Test
-        out = self.conv2d(out)
-        out = self.activation(out)
-        print(out)
-
-        return out, out
-    
         out_pos = self.srb.head_block_pos_1(out)
+        print(out_pos)
+
+        return out_pos, out_pos
+    
         out_cos = self.srb.head_block_cos_1(out)
         out_sin = self.srb.head_block_sin_1(out)
         out_width = self.srb.head_block_width_1(out)
