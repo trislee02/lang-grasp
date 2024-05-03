@@ -176,6 +176,11 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
     ):
         super(LGrasp, self).__init__()
 
+        if backbone in ["clipRN50x16_vitl16_384"]:
+            self.out_c = 768
+        else:
+            self.out_c = 512
+
         self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07)).exp()
 
         self.lseg_net = make_lseg()  

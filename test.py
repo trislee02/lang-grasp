@@ -20,9 +20,13 @@ image = image.cuda()
 text_features, image_features = module((image, ('grasp the mug at the handle')))
 
 fig, ax = plt.subplots(nrows=5, ncols=7)
-for r, row in enumerate(ax):
-    for c, col in enumerate(row):
-        img = image_features[0][r*len(row) + c].detach().cpu().numpy()
-        img = (img - img.min()) / (img.max() - img.min())
-        col.imshow(img, cmap='gray')
-plt.savefig(f"image_features.png")
+img = image_features[0][0].detach().cpu().numpy()
+img = (img - img.min()) / (img.max() - img.min())
+ax.imshow(img)
+
+# for r, row in enumerate(ax):
+#     for c, col in enumerate(row):
+#         img = image_features[0][r*len(row) + c].detach().cpu().numpy()
+#         img = (img - img.min()) / (img.max() - img.min())
+#         col.imshow(img, cmap='gray')
+plt.savefig(f"logits.png")
