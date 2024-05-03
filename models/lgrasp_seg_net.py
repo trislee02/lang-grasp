@@ -224,8 +224,6 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
 
-        return pos_output, pos_output
-    
         return pos_output, cos_output, sin_output, width_output
 
 class LGraspNet(LGrasp):
