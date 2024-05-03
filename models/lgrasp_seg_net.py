@@ -224,6 +224,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # Test
         out = self.conv2d(out)
+        print(out)
         out = self.activation(out)
 
         return out, out
