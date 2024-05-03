@@ -188,6 +188,9 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         self.lseg_net = make_lseg()  
 
         self.srb = _make_srb_block(activation=kwargs["activation"])
+
+        self.conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1)
+        self.activation = nn.ReLU()
         
 
     def forward(self, x_in, prompt=''):
@@ -219,6 +222,10 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
+        # Test
+        out = self.conv2d(out)
+        out = self.activation(out)
+        
         return out, out
     
         out_pos = self.srb.head_block_pos_1(out)
