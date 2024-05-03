@@ -239,6 +239,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
+        return out, out, out, out
         # Test
         # out_pos = self.srb.head_block_pos_1(out)
         # out_cos = self.srb.head_block_cos_1(out)
