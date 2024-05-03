@@ -257,7 +257,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        out = F.relu(self.grcnn.bn1(self.conv1(out)))
+        out = F.relu(self.grcnn.bn1(self.grcnn.conv1(out)))
         out = F.relu(self.grcnn.bn2(self.grcnn.conv2(out)))
         out = F.relu(self.grcnn.bn3(self.grcnn.conv3(out)))
         out = self.grcnn.res1(out)
