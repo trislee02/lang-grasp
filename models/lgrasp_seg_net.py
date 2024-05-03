@@ -239,7 +239,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        return out, out, out, out
+        
         # Test
         # out_pos = self.srb.head_block_pos_1(out)
         # out_cos = self.srb.head_block_cos_1(out)
@@ -258,28 +258,34 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (after headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
-        out = F.relu(self.grcnn.bn1(self.grcnn.conv1(out)))
-        out = F.relu(self.grcnn.bn2(self.grcnn.conv2(out)))
-        out = F.relu(self.grcnn.bn3(self.grcnn.conv3(out)))
-        out = self.grcnn.res1(out)
-        out = self.grcnn.res2(out)
-        out = self.grcnn.res3(out)
-        out = self.grcnn.res4(out)
-        out = self.grcnn.res5(out)
-        out = F.relu(self.grcnn.bn4(self.grcnn.conv4(out)))
-        out = F.relu(self.grcnn.bn5(self.grcnn.conv5(out)))
-        out = self.grcnn.conv6(out)
+        # out = F.relu(self.grcnn.bn1(self.grcnn.conv1(out)))
+        # out = F.relu(self.grcnn.bn2(self.grcnn.conv2(out)))
+        # out = F.relu(self.grcnn.bn3(self.grcnn.conv3(out)))
+        # out = self.grcnn.res1(out)
+        # out = self.grcnn.res2(out)
+        # out = self.grcnn.res3(out)
+        # out = self.grcnn.res4(out)
+        # out = self.grcnn.res5(out)
+        # out = F.relu(self.grcnn.bn4(self.grcnn.conv4(out)))
+        # out = F.relu(self.grcnn.bn5(self.grcnn.conv5(out)))
+        # out = self.grcnn.conv6(out)
 
-        out_pos = self.grcnn.pos_output(out)
-        out_cos = self.grcnn.cos_output(out)
-        out_sin = self.grcnn.sin_output(out)
-        out_width = self.grcnn.width_output(out)
+        # out_pos = self.grcnn.pos_output(out)
+        # out_cos = self.grcnn.cos_output(out)
+        # out_sin = self.grcnn.sin_output(out)
+        # out_width = self.grcnn.width_output(out)
 
         # Bilinear interpolation
-        pos_output = self.srb.output_conv_pos(out_pos) # [batch_size, 1, H, W]
-        cos_output = self.srb.output_conv_cos(out_cos)
-        sin_output = self.srb.output_conv_sin(out_sin)
-        width_output = self.srb.output_conv_width(out_width)
+        # pos_output = self.srb.output_conv_pos(out_pos) # [batch_size, 1, H, W]
+        # cos_output = self.srb.output_conv_cos(out_cos)
+        # sin_output = self.srb.output_conv_sin(out_sin)
+        # width_output = self.srb.output_conv_width(out_width)
+
+        # Debug
+        pos_output = self.srb.output_conv_pos(out) # [batch_size, 1, H, W]
+        cos_output = self.srb.output_conv_cos(out)
+        sin_output = self.srb.output_conv_sin(out)
+        width_output = self.srb.output_conv_width(out)
 
         # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
 
