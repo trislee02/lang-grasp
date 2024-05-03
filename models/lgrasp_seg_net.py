@@ -202,9 +202,9 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         out_sin = self.srb.head_block_sin_1(out)
         out_width = self.srb.head_block_width_1(out)
 
-        print(out_width)
+        print(out_pos)
 
-        return out_width, out_width
+        return out_pos, out_pos
     
 
     
