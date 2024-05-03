@@ -214,9 +214,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
 
-        return out, out
-
-        self.out_logits_per_image = out.detach().clone()
+        return 1, out.detach().clone()
 
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
