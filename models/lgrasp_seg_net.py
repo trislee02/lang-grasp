@@ -121,6 +121,8 @@ def _make_srb_block(activation='relu'):
         Interpolate(scale_factor=2, mode="bilinear", align_corners=True),
     )
 
+    print(f"Weight: {srb.head_block_pos_1.depthwise.depthwise.weight}")
+
     return srb.cuda()
 
 lseg_out = {}
