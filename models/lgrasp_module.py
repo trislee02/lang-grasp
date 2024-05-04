@@ -61,7 +61,18 @@ class LGraspModule(pl.LightningModule):
                     wandb.Image(lossd['gt']['pos'][0][0], caption=f"{x[1][0]}-gt_pos"),
                     wandb.Image(lossd['gt']['cos'][0][0], caption=f"{x[1][0]}-gt_cos"),
                     wandb.Image(lossd['gt']['sin'][0][0], caption=f"{x[1][0]}-gt_sin"),
-                    wandb.Image(lossd['gt']['width'][0][0], caption=f"{x[1][0]}-gt_width")]  
+                    wandb.Image(lossd['gt']['width'][0][0], caption=f"{x[1][0]}-gt_width"),
+                    wandb.Image(lossd['features']['logit'][0][0], caption=f"{x[1][0]}-logit"),
+                    wandb.Image(lossd['features']['images_features'][0][0], caption=f"{x[1][0]}-images_features_channel_0"),
+                    wandb.Image(lossd['features']['images_features'][0][1], caption=f"{x[1][0]}-images_features_channel_1"),
+                    wandb.Image(lossd['features']['images_features'][0][2], caption=f"{x[1][0]}-images_features_channel_2"),
+                    wandb.Image(lossd['features']['images_features'][0][3], caption=f"{x[1][0]}-images_features_channel_3"),
+                    wandb.Image(lossd['features']['images_features'][0][4], caption=f"{x[1][0]}-images_features_channel_4"),
+                    wandb.Image(lossd['features']['images_features'][0][5], caption=f"{x[1][0]}-images_features_channel_5"),
+                    wandb.Image(lossd['features']['images_features'][0][6], caption=f"{x[1][0]}-images_features_channel_6"),
+                    wandb.Image(lossd['features']['images_features'][0][7], caption=f"{x[1][0]}-images_features_channel_7"),
+                    wandb.Image(lossd['features']['images_features'][0][8], caption=f"{x[1][0]}-images_features_channel_8"),
+                    wandb.Image(lossd['features']['images_features'][0][9], caption=f"{x[1][0]}-images_features_channel_9")]
             
         wandb_logger = self.logger.experiment
         wandb_logger.log({"plot": plot_img})

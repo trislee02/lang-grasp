@@ -216,7 +216,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         self.grcnn = _make_grcnn(input_channels=1, output_channels=1, channel_size=32)    
 
-    def forward(self, x_in, prompt=''):
+    def forward(self, x_in, prompt='', return_logit=True):
         # x[0] is a Tensor [batch_size, c_channels, h, w]
         # x[1] is a Tuple with `batch_size` prompts
         if isinstance(x_in, tuple):
@@ -225,6 +225,7 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         text_features, _ = self.lseg_net(x, prompt, features_only=True)
         image_features = lseg_out['image_features']
+        out_image_features = image_features.detach().clone()
 
         text_features = text_features.unsqueeze(1)
         # print(f"Text features shape: {text_features.shape}") # [batch_size, 1, out_c] 
@@ -242,8 +243,10 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         # print(f"Logits per image shape: {logits_per_image.shape}") # [batch_size, H/2 * W/2, 1]
 
         out = logits_per_image.float().view(imshape[0], imshape[2], imshape[3], -1).permute(0,3,1,2)
-        # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
 
+        out_logit = out.detach().clone()
+
+        # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
         
         # Test
         out_pos = self.srb.head_block_pos_1(out)
@@ -299,7 +302,10 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
 
         # print(f"Out (after output_conv_pos) shape: {out.shape}") # [batch_size, 1, H, W]
 
-        return pos_output, cos_output, sin_output, width_output
+        if return_logit:
+            return pos_output, cos_output, sin_output, width_output, out_logit, out_image_features
+        else:
+            return pos_output, cos_output, sin_output, width_output
 
 class LGraspNet(LGrasp):
     """Network for semantic segmentation."""

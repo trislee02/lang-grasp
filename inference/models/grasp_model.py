@@ -17,7 +17,7 @@ class GraspModel(nn.Module):
     def compute_loss(self, xc, yc):
         # print(f"Input shape: {xc.shape}") # [1, 3, 224, 224]
         y_pos, y_cos, y_sin, y_width = yc
-        pos_pred, cos_pred, sin_pred, width_pred = self(xc)
+        pos_pred, cos_pred, sin_pred, width_pred, out_logit, out_images_features = self(xc)
 
         # print(f"Prediction shape: {pos_pred.shape}, {cos_pred.shape}, {sin_pred.shape}, {width_pred.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
         # print(f"Ground truth shape: {y_pos.shape}, {y_cos.shape}, {y_sin.shape}, {y_width.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
@@ -55,6 +55,10 @@ class GraspModel(nn.Module):
                 'cos': y_cos,
                 'sin': y_sin,
                 'width': y_width
+            },
+            'features': {
+                'logit': out_logit,
+                'images_features': out_images_features
             }
         }
 
