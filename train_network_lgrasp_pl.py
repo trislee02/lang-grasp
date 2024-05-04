@@ -59,7 +59,7 @@ def parse_args():
                         help='Dataset Name ("cornell" or "jaquard")')
     parser.add_argument('--dataset-path', type=str,
                         help='Path to dataset')
-    parser.add_argument('--split', type=float, default=0.1,
+    parser.add_argument('--split', type=float, default=0.9,
                         help='Fraction of data for training (remainder is validation)')
     parser.add_argument('--ds-shuffle', action='store_true', default=False,
                         help='Shuffle the dataset')
@@ -183,7 +183,7 @@ def run():
         dataset,
         batch_size=1,
         num_workers=args.num_workers,
-        sampler=train_sampler # TODO: Change to val_sampler
+        sampler=val_sampler
     )
     logging.info('Done')
 
