@@ -148,7 +148,7 @@ class LGraspModule(pl.LightningModule):
         plt.ion()
         plt.clf()
         ax = plt.subplot(111)
-        ax.imshow(x[0][0].cpu())
+        ax.imshow(x[0][0].cpu().numpy().transpose(1, 2, 0))
         for g in grasps:
             g.plot(ax)
         ax.axis('off')
