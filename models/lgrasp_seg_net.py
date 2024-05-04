@@ -72,10 +72,15 @@ def _make_fusion_block(features, use_bn):
 
 def _make_srb_block(activation='lrelu'):
     srb = nn.Module()
-    srb.head_block_pos_1 = depthwise_block(activation=activation)
-    srb.head_block_cos_1 = depthwise_block(activation=activation)
-    srb.head_block_sin_1 = depthwise_block(activation=activation)
-    srb.head_block_width_1 = depthwise_block(activation=activation)
+    srb.head_block_pos_1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
+    srb.head_block_cos_1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
+    srb.head_block_sin_1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
+    srb.head_block_width_1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
+
+    srb.head_block_pos_2 = nn.Conv2d(32, 1, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
+    srb.head_block_cos_2 = nn.Conv2d(32, 1, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
+    srb.head_block_sin_2 = nn.Conv2d(32, 1, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
+    srb.head_block_width_2 = nn.Conv2d(32, 1, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
 
     # srb.head_block_pos_2 = depthwise_block(activation=activation)
     # srb.head_block_cos_2 = depthwise_block(activation=activation)
@@ -245,6 +250,11 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         out_cos = self.srb.head_block_cos_1(out)
         out_sin = self.srb.head_block_sin_1(out)
         out_width = self.srb.head_block_width_1(out)
+
+        out_pos = self.srb.head_block_pos_2(out_pos)
+        out_cos = self.srb.head_block_cos_2(out_cos)
+        out_sin = self.srb.head_block_sin_2(out_sin)
+        out_width = self.srb.head_block_width_2(out_width)
     
         # out_pos = self.srb.head_block_pos_2(out_pos)
         # out_cos = self.srb.head_block_cos_2(out_cos)
