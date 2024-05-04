@@ -53,19 +53,18 @@ class LGraspModule(pl.LightningModule):
             loss = lossd['loss']
         self.log("train_loss", loss)
 
-        if (batch_idx == 0):
-            plot_img = [wandb.Image(x[0][0], caption=x[1][0]), 
-                        wandb.Image(lossd['pred']['pos'][0][0], caption=f"{x[1][0]}-pred_pos"),
-                        wandb.Image(lossd['pred']['cos'][0][0], caption=f"{x[1][0]}-pred_cos"),
-                        wandb.Image(lossd['pred']['sin'][0][0], caption=f"{x[1][0]}-pred_sin"),
-                        wandb.Image(lossd['pred']['width'][0][0], caption=f"{x[1][0]}-pred_width"),
-                        wandb.Image(lossd['gt']['pos'][0][0], caption=f"{x[1][0]}-gt_pos"),
-                        wandb.Image(lossd['gt']['cos'][0][0], caption=f"{x[1][0]}-gt_cos"),
-                        wandb.Image(lossd['gt']['sin'][0][0], caption=f"{x[1][0]}-gt_sin"),
-                        wandb.Image(lossd['gt']['width'][0][0], caption=f"{x[1][0]}-gt_width")]  
-                
-            wandb_logger = self.logger.experiment
-            wandb_logger.log({"plot": plot_img})
+        plot_img = [wandb.Image(x[0][0], caption=x[1][0]), 
+                    wandb.Image(lossd['pred']['pos'][0][0], caption=f"{x[1][0]}-pred_pos"),
+                    wandb.Image(lossd['pred']['cos'][0][0], caption=f"{x[1][0]}-pred_cos"),
+                    wandb.Image(lossd['pred']['sin'][0][0], caption=f"{x[1][0]}-pred_sin"),
+                    wandb.Image(lossd['pred']['width'][0][0], caption=f"{x[1][0]}-pred_width"),
+                    wandb.Image(lossd['gt']['pos'][0][0], caption=f"{x[1][0]}-gt_pos"),
+                    wandb.Image(lossd['gt']['cos'][0][0], caption=f"{x[1][0]}-gt_cos"),
+                    wandb.Image(lossd['gt']['sin'][0][0], caption=f"{x[1][0]}-gt_sin"),
+                    wandb.Image(lossd['gt']['width'][0][0], caption=f"{x[1][0]}-gt_width")]  
+            
+        wandb_logger = self.logger.experiment
+        wandb_logger.log({"plot": plot_img})
                                  
         return loss
 
