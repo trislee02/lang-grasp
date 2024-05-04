@@ -218,9 +218,10 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
             x = x_in[0]
             prompt = list(x_in[1])
 
-        text_features, image_features = self.lseg_net(x, prompt, features_only=True)
+        text_features, _ = self.lseg_net(x, prompt, features_only=True)
+        image_features = lseg_out['image_features']
         # return text_features, image_features
-
+        return image_features, image_features, image_features, image_features
         text_features = text_features.unsqueeze(1)
         # print(f"Text features shape: {text_features.shape}") # [batch_size, 1, out_c] 
 
