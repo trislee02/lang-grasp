@@ -21,16 +21,20 @@ class GraspModel(nn.Module):
 
         # print(f"Prediction shape: {pos_pred.shape}, {cos_pred.shape}, {sin_pred.shape}, {width_pred.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
         # print(f"Ground truth shape: {y_pos.shape}, {y_cos.shape}, {y_sin.shape}, {y_width.shape}") # [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224], [1, 1, 224, 224]
+        weight_pos = (y_pos != 0).float() + 1e-3
+        weight_cos = (y_cos != 0).float() + 1e-3
+        weight_sin = (y_sin != 0).float() + 1e-3
+        weight_width = (y_width != 0).float() + 1e-3
 
-        weighted_pos_pred = pos_pred * (y_pos + 1e-3)
-        weighted_cos_pred = cos_pred * (y_cos + 1e-3)
-        weighted_sin_pred = sin_pred * (y_sin + 1e-3)
-        weighted_width_pred = width_pred * (y_width + 1e-3)
+        weighted_pos_pred = pos_pred * weight_pos
+        weighted_cos_pred = cos_pred * weight_cos
+        weighted_sin_pred = sin_pred * weight_sin
+        weighted_width_pred = width_pred * weight_width
 
-        p_loss = F.smooth_l1_loss(weighted_pos_pred, y_pos * (y_pos + 1e-3), reduction='mean')
-        cos_loss = F.smooth_l1_loss(weighted_cos_pred, y_cos * (y_cos + 1e-3), reduction='mean')
-        sin_loss = F.smooth_l1_loss(weighted_sin_pred, y_sin * (y_sin + 1e-3), reduction='mean')
-        width_loss = F.smooth_l1_loss(weighted_width_pred, y_width * (y_width + 1e-3), reduction='mean') 
+        p_loss = F.smooth_l1_loss(weighted_pos_pred, y_pos * weight_pos, reduction='mean')
+        cos_loss = F.smooth_l1_loss(weighted_cos_pred, y_cos * weight_cos, reduction='mean')
+        sin_loss = F.smooth_l1_loss(weighted_sin_pred, y_sin * weight_sin, reduction='mean')
+        width_loss = F.smooth_l1_loss(weighted_width_pred, y_width * weight_width, reduction='mean') 
 
         return {
             'loss': p_loss + cos_loss + sin_loss + width_loss,
