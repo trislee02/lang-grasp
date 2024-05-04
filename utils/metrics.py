@@ -34,6 +34,8 @@ class GraspAccuracy:
             self.results['correct'] += 1
         else:
             self.results['failed'] += 1
+        
+        return s
 
     def reset(self):
         self.results = {
