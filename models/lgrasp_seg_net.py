@@ -77,10 +77,14 @@ def _make_srb_block(activation='lrelu'):
     srb.head_block_sin_1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
     srb.head_block_width_1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
 
+    srb.block1_act = nn.LeakyReLU()
+
     srb.head_block_pos_2 = nn.Conv2d(32, 1, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
     srb.head_block_cos_2 = nn.Conv2d(32, 1, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
     srb.head_block_sin_2 = nn.Conv2d(32, 1, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
     srb.head_block_width_2 = nn.Conv2d(32, 1, kernel_size=3, stride=1, padding=1) # depthwise_block(activation=activation)
+
+    srb.block2_act = nn.LeakyReLU()
 
     # srb.head_block_pos_2 = depthwise_block(activation=activation)
     # srb.head_block_cos_2 = depthwise_block(activation=activation)
@@ -249,10 +253,10 @@ class LGrasp(GraspModel): # Origin: LSeg(BaseModel)
         # print(f"Out (before headblock) shape: {out.shape}") # [batch_size, 1, H/2, W/2]
         
         # Test
-        out_pos = self.srb.head_block_pos_1(out)
-        out_cos = self.srb.head_block_cos_1(out)
-        out_sin = self.srb.head_block_sin_1(out)
-        out_width = self.srb.head_block_width_1(out)
+        out_pos = self.srb.block1_act(self.srb.head_block_pos_1(out))
+        out_cos = self.srb.block1_act(self.srb.head_block_cos_1(out))
+        out_sin = self.srb.block1_act(self.srb.head_block_sin_1(out))
+        out_width = self.srb.block1_act(self.srb.head_block_width_1(out))
 
         out_pos = self.srb.head_block_pos_2(out_pos)
         out_cos = self.srb.head_block_cos_2(out_cos)

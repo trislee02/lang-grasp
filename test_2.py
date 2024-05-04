@@ -1,13 +1,15 @@
-import torch
-import torch.nn as nn
+import matplotlib.pyplot as plt
+import numpy as np
 
-conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1, bias=False)
+fig, ax = plt.subplots()
+ax.plot([1, 2, 3], [4, 5, 6])
+fig.canvas.draw()
 
-y = torch.tensor([[0, 1, 0], 
-                  [2.1, 0, 3], 
-                  [0, 4, 0]]).float()
-print(y)
+# Convert the canvas to a raw RGB buffer
+buf = fig.canvas.tostring_rgb()
+ncols, nrows = fig.canvas.get_width_height()
+image = np.frombuffer(buf, dtype=np.uint8).reshape(nrows, ncols, 3)
 
-# Create a mask with the same shape as `y` with 1 at element greater than 0 and 0 otherwise
-mask = (y != 0).float()
-print(mask)
+print("Image shape:", image.shape)
+print("First 3x3 pixels and RGB values:")
+print(image[:3, :3, :])

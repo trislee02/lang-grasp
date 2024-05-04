@@ -7,7 +7,9 @@ from utils.metrics import GraspAccuracy
 from .lgrasp_seg_net import LGraspNet
 from pytorch_lightning.utilities import grad_norm
 from inference.post_process import post_process_output
-
+from utils.dataset_processing import grasp
+import matplotlib.pyplot as plt
+import numpy as np
 
 class LGraspModule(pl.LightningModule):
     def __init__(self, 
@@ -136,6 +138,29 @@ class LGraspModule(pl.LightningModule):
                     wandb.Image(lossd['features']['images_features'][0][7], caption=f"{x[1][0]}-images_features_channel_7"),
                     wandb.Image(lossd['features']['images_features'][0][8], caption=f"{x[1][0]}-images_features_channel_8"),
                     wandb.Image(lossd['features']['images_features'][0][9], caption=f"{x[1][0]}-images_features_channel_9")]
+        
+        q_img, ang_img, width_img = post_process_output(lossd['pred']['pos'], lossd['pred']['cos'],
+                                                        lossd['pred']['sin'], lossd['pred']['width'])
+        
+        grasps = grasp.detect_grasps(q_img, ang_img, width_img=width_img, no_grasps=1)
+
+        fig = plt.figure(figsize=(10, 10))
+        plt.ion()
+        plt.clf()
+        ax = plt.subplot(111)
+        ax.imshow(x[0][0])
+        for g in grasps:
+            g.plot(ax)
+        ax.axis('off')
+        fig.canvas.draw()
+
+        # Convert the canvas to a raw RGB buffer
+        buf = fig.canvas.tostring_rgb()
+        ncols, nrows = fig.canvas.get_width_height()
+        image = np.frombuffer(buf, dtype=np.uint8).reshape(nrows, ncols, 3)
+
+        plot_img.append(wandb.Image(image, caption=f"{x[1][0]}-grasp"))
+
         if res:        
             if self.val_accuracy.results['correct'] < 11:
                 wandb_logger = self.logger.experiment
