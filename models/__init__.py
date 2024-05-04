@@ -28,7 +28,7 @@ def make_trainer(args):
     args.max_epochs = args.epochs
 
     # Clip the gradient
-    args.gradient_clip_val=0.5
+    # args.gradient_clip_val=0.5
 
     wandb.login()
 
