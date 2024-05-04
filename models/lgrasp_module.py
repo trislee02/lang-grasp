@@ -116,31 +116,32 @@ class LGraspModule(pl.LightningModule):
         zoom_factor = zoom_factor.item()
         res = self.val_accuracy.update(lossd, didx, rot, zoom_factor)
 
-        if batch_idx < 10:
-            plot_img = [wandb.Image(x[0][0], caption=x[1][0]), 
-                        wandb.Image(lossd['pred']['pos'][0][0], caption=f"{x[1][0]}-pred_pos"),
-                        wandb.Image(lossd['pred']['cos'][0][0], caption=f"{x[1][0]}-pred_cos"),
-                        wandb.Image(lossd['pred']['sin'][0][0], caption=f"{x[1][0]}-pred_sin"),
-                        wandb.Image(lossd['pred']['width'][0][0], caption=f"{x[1][0]}-pred_width"),
-                        wandb.Image(lossd['gt']['pos'][0][0], caption=f"{x[1][0]}-gt_pos"),
-                        wandb.Image(lossd['gt']['cos'][0][0], caption=f"{x[1][0]}-gt_cos"),
-                        wandb.Image(lossd['gt']['sin'][0][0], caption=f"{x[1][0]}-gt_sin"),
-                        wandb.Image(lossd['gt']['width'][0][0], caption=f"{x[1][0]}-gt_width"),
-                        wandb.Image(lossd['features']['logit'][0][0], caption=f"{x[1][0]}-logit"),
-                        wandb.Image(lossd['features']['images_features'][0][0], caption=f"{x[1][0]}-images_features_channel_0"),
-                        wandb.Image(lossd['features']['images_features'][0][1], caption=f"{x[1][0]}-images_features_channel_1"),
-                        wandb.Image(lossd['features']['images_features'][0][2], caption=f"{x[1][0]}-images_features_channel_2"),
-                        wandb.Image(lossd['features']['images_features'][0][3], caption=f"{x[1][0]}-images_features_channel_3"),
-                        wandb.Image(lossd['features']['images_features'][0][4], caption=f"{x[1][0]}-images_features_channel_4"),
-                        wandb.Image(lossd['features']['images_features'][0][5], caption=f"{x[1][0]}-images_features_channel_5"),
-                        wandb.Image(lossd['features']['images_features'][0][6], caption=f"{x[1][0]}-images_features_channel_6"),
-                        wandb.Image(lossd['features']['images_features'][0][7], caption=f"{x[1][0]}-images_features_channel_7"),
-                        wandb.Image(lossd['features']['images_features'][0][8], caption=f"{x[1][0]}-images_features_channel_8"),
-                        wandb.Image(lossd['features']['images_features'][0][9], caption=f"{x[1][0]}-images_features_channel_9")]
-            if res:        
+        plot_img = [wandb.Image(x[0][0], caption=x[1][0]), 
+                    wandb.Image(lossd['pred']['pos'][0][0], caption=f"{x[1][0]}-pred_pos"),
+                    wandb.Image(lossd['pred']['cos'][0][0], caption=f"{x[1][0]}-pred_cos"),
+                    wandb.Image(lossd['pred']['sin'][0][0], caption=f"{x[1][0]}-pred_sin"),
+                    wandb.Image(lossd['pred']['width'][0][0], caption=f"{x[1][0]}-pred_width"),
+                    wandb.Image(lossd['gt']['pos'][0][0], caption=f"{x[1][0]}-gt_pos"),
+                    wandb.Image(lossd['gt']['cos'][0][0], caption=f"{x[1][0]}-gt_cos"),
+                    wandb.Image(lossd['gt']['sin'][0][0], caption=f"{x[1][0]}-gt_sin"),
+                    wandb.Image(lossd['gt']['width'][0][0], caption=f"{x[1][0]}-gt_width"),
+                    wandb.Image(lossd['features']['logit'][0][0], caption=f"{x[1][0]}-logit"),
+                    wandb.Image(lossd['features']['images_features'][0][0], caption=f"{x[1][0]}-images_features_channel_0"),
+                    wandb.Image(lossd['features']['images_features'][0][1], caption=f"{x[1][0]}-images_features_channel_1"),
+                    wandb.Image(lossd['features']['images_features'][0][2], caption=f"{x[1][0]}-images_features_channel_2"),
+                    wandb.Image(lossd['features']['images_features'][0][3], caption=f"{x[1][0]}-images_features_channel_3"),
+                    wandb.Image(lossd['features']['images_features'][0][4], caption=f"{x[1][0]}-images_features_channel_4"),
+                    wandb.Image(lossd['features']['images_features'][0][5], caption=f"{x[1][0]}-images_features_channel_5"),
+                    wandb.Image(lossd['features']['images_features'][0][6], caption=f"{x[1][0]}-images_features_channel_6"),
+                    wandb.Image(lossd['features']['images_features'][0][7], caption=f"{x[1][0]}-images_features_channel_7"),
+                    wandb.Image(lossd['features']['images_features'][0][8], caption=f"{x[1][0]}-images_features_channel_8"),
+                    wandb.Image(lossd['features']['images_features'][0][9], caption=f"{x[1][0]}-images_features_channel_9")]
+        if res:        
+            if self.val_accuracy.results['correct'] < 11:
                 wandb_logger = self.logger.experiment
                 wandb_logger.log({"correct_sample": plot_img})
-            else:
+        else:
+            if self.val_accuracy.results['failed'] < 11:
                 wandb_logger = self.logger.experiment
                 wandb_logger.log({"incorrect_sample": plot_img})
 
